@@ -1,0 +1,205 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   MediCenter Design System — tokens (light + dark)
+   Derived pixel-for-pixel from the reference designs.
+   ============================================================ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Brand purple */
+  --brand-500: #7c5cfc;
+  --brand-600: #6d4fe0;
+  --brand-700: #5b3fd0;
+  --brand-gradient: linear-gradient(135deg, #6d4fe0 0%, #7c5cfc 100%);
+
+  /* Semantic status */
+  --green-500: #22c55e;
+  --amber-500: #f59e0b;
+  --red-500: #ef4444;
+  --rose-500: #f43f5e;
+  --blue-500: #3b82f6;
+
+  /* Light theme surfaces & text */
+  --bg: #f5f5fb;
+  --bg-elevated: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f3f2fb;
+  --surface-muted: #f7f7fc;
+  --text: #1e1b2e;
+  --text-muted: #8a8699;
+  --text-faint: #b4b0c4;
+  --border: #ece9f6;
+  --border-strong: #ddd8ee;
+
+  /* Tinted status backgrounds (light) */
+  --green-soft: #e8f8ef;
+  --amber-soft: #fef3e2;
+  --red-soft: #fdecec;
+  --brand-soft: #efeaff;
+  --blue-soft: #e7f0fe;
+
+  /* Shape */
+  --radius-sm: 12px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --shadow-card: 0 8px 24px -12px rgba(60, 45, 120, 0.18);
+  --shadow-float: 0 12px 32px -8px rgba(60, 45, 120, 0.28);
+}
+
+.dark {
+  /* Pure-black theme with a monochrome (black & white) accent system. */
+  --bg: #000000;
+  --bg-elevated: #0a0a0a;
+  --surface: #0e0e0e;
+  --surface-2: #1a1a1a;
+  --surface-muted: #121212;
+  --text: #ffffff;
+  --text-muted: #a1a1aa;
+  --text-faint: #6b6b72;
+  --border: #242424;
+  --border-strong: #343434;
+
+  /* Accents collapse to white so primary UI is black & white. */
+  --brand-500: #ffffff;
+  --brand-600: #ededed;
+  --brand-700: #d8d8d8;
+  --brand-gradient: linear-gradient(135deg, #ffffff 0%, #ededed 100%);
+
+  --green-soft: #0e1a12;
+  --amber-soft: #1c1608;
+  --red-soft: #1e1012;
+  --brand-soft: #1b1b1b;
+  --blue-soft: #0b1520;
+
+  --shadow-card: 0 8px 24px -12px rgba(0, 0, 0, 0.8);
+  --shadow-float: 0 12px 32px -8px rgba(0, 0, 0, 0.9);
+}
+
+/* In dark mode the brand gradient becomes a white "pill" — force its
+   content (label + icons) to black so buttons read as black-on-white. */
+.dark .bg-brand-gradient,
+.dark .bg-brand-gradient * {
+  color: #000000 !important;
+}
+
+/* Darken the Home hero so the theme stays pure black. */
+.dark .next-dose-hero {
+  background-image: linear-gradient(120deg, #0a0a0a 0%, #141414 60%, #1c1c1c 100%) !important;
+}
+
+/* Map tokens into Tailwind's theme so utilities like bg-surface work
+   and automatically respond to the .dark class. */
+@theme inline {
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+
+  --color-green-500: var(--green-500);
+  --color-amber-500: var(--amber-500);
+  --color-red-500: var(--red-500);
+  --color-rose-500: var(--rose-500);
+  --color-blue-500: var(--blue-500);
+
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-green-soft: var(--green-soft);
+  --color-amber-soft: var(--amber-soft);
+  --color-red-soft: var(--red-soft);
+  --color-brand-soft: var(--brand-soft);
+  --color-blue-soft: var(--blue-soft);
+
+  --radius-card: var(--radius);
+  --radius-card-lg: var(--radius-lg);
+  --radius-card-xl: var(--radius-xl);
+
+  --shadow-card: var(--shadow-card);
+  --shadow-float: var(--shadow-float);
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ---------- base ---------- */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Hide scrollbars for horizontal chip rows / carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Brand gradient helper */
+.bg-brand-gradient {
+  background-image: var(--brand-gradient);
+}
+.text-brand-gradient {
+  background-image: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Smooth page entrance — replays on every route change (keyed in AppShell). */
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: pageIn 0.34s cubic-bezier(0.22, 0.7, 0.2, 1) both;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
