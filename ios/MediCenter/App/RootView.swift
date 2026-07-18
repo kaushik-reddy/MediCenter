@@ -24,7 +24,7 @@ struct RootView: View {
                 // Floating bottom nav + center add button
                 CustomTabBar(
                     selected: $app.selectedTab,
-                    onAdd: { app.present(AddMedicationModal()) }
+                    onAdd: { app.presentFullScreen(AddMedicationWizardView()) }
                 )
             }
             .navigationBarHidden(true)
@@ -43,6 +43,14 @@ struct RootView: View {
                 }
             }
             .animation(.easeOut(duration: 0.2), value: app.modal != nil)
+            .fullScreenCover(isPresented: Binding(
+                get: { app.fullScreenFlow != nil },
+                set: { if !$0 { app.fullScreenFlow = nil } }
+            )) {
+                if let flow = app.fullScreenFlow {
+                    flow.environment(app)
+                }
+            }
             .navigationDestination(for: AppRoute.self) { route in
                 Group {
                     switch route {

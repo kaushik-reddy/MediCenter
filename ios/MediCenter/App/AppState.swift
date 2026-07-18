@@ -19,12 +19,23 @@ final class AppState {
     // Presented modal (centered-card popup)
     var modal: AnyView? = nil
 
+    // Presented full-screen flow (multi-step wizard)
+    var fullScreenFlow: AnyView? = nil
+
     func present<V: View>(_ view: V) {
         modal = AnyView(view)
     }
 
     func dismissModal() {
         modal = nil
+    }
+
+    func presentFullScreen<V: View>(_ view: V) {
+        fullScreenFlow = AnyView(view)
+    }
+
+    func dismissFullScreen() {
+        fullScreenFlow = nil
     }
 
     func open(_ route: AppRoute) {
