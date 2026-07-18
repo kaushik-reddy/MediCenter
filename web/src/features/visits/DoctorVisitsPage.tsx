@@ -1,11 +1,10 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Stethoscope, Clock, ChevronRight, CheckCircle2, Calendar, Bell, Plus, Upload } from 'lucide-react'
 import { useShell } from '../../components/shell/shellContext'
 import { TopBar } from '../../components/shell/TopBar'
 import { Banner } from '../../components/ui/Banner'
-import { Modal, Field, ModalActions } from '../../components/ui/Modal'
 import { InfoModal } from '../flows/FlowModals'
+import { AddAppointmentWizard } from '../flows/AddAppointmentWizard'
 
 interface Appt {
   id: string
@@ -130,17 +129,5 @@ function Tile({ bg, fg, icon, n, label }: { bg: string; fg: string; icon: React.
 }
 
 function AddAppointmentModal() {
-  const [doctor, setDoctor] = useState('')
-  const [spec, setSpec] = useState('')
-  const [date, setDate] = useState('')
-  const [time, setTime] = useState('')
-  return (
-    <Modal icon={<Stethoscope size={22} />} title="Add Appointment" subtitle="Book a doctor visit">
-      <Field label="Doctor Name" value={doctor} onChange={setDoctor} placeholder="e.g. Dr. Sharma" />
-      <Field label="Specialization" value={spec} onChange={setSpec} placeholder="e.g. Cardiologist" />
-      <Field label="Date" value={date} onChange={setDate} placeholder="24 May 2024" />
-      <Field label="Time" value={time} onChange={setTime} placeholder="10:30 AM" />
-      <ModalActions primaryLabel="Confirm Appointment" />
-    </Modal>
-  )
+  return <AddAppointmentWizard />
 }

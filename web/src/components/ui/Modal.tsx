@@ -33,34 +33,36 @@ export function Modal({
   const close = onClose ?? closeModal
 
   return (
-    <div className="pointer-events-auto absolute inset-0 z-[60] flex items-center justify-center p-5">
+    <div className="pointer-events-auto absolute inset-0 z-[60] flex items-end justify-center p-3 sm:items-center sm:p-5">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-md animate-[fadeIn_0.2s_ease]"
         onClick={close}
       />
-      <div className="relative z-10 w-full max-w-[360px] rounded-[24px] bg-surface p-5 shadow-[var(--shadow-float)]">
+      <div className="relative z-10 flex max-h-[calc(100%-1rem)] w-full max-w-[380px] flex-col overflow-hidden rounded-[24px] bg-surface shadow-[var(--shadow-float)]">
         {!hideClose && (
           <button
             type="button"
             onClick={close}
             aria-label="Close"
-            className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-surface-2 text-text-muted active:scale-95"
+            className="absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-full bg-surface-2 text-text-muted active:scale-95"
           >
             <X size={16} />
           </button>
         )}
 
-        {icon && (
-          <div className={`mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl ${iconBg} ${iconFg}`}>
-            {icon}
-          </div>
-        )}
-        {title && <h3 className="text-center text-[18px] font-bold text-text">{title}</h3>}
-        {subtitle && (
-          <p className="mx-auto mt-1 max-w-[280px] text-center text-[13px] text-text-muted">{subtitle}</p>
-        )}
+        <div className="no-scrollbar overflow-y-auto p-5">
+          {icon && (
+            <div className={`mx-auto mb-3 grid h-14 w-14 place-items-center rounded-2xl ${iconBg} ${iconFg}`}>
+              {icon}
+            </div>
+          )}
+          {title && <h3 className="text-center text-[18px] font-bold text-text">{title}</h3>}
+          {subtitle && (
+            <p className="mx-auto mt-1 max-w-[280px] text-center text-[13px] text-text-muted">{subtitle}</p>
+          )}
 
-        <div className={icon || title ? 'mt-4' : ''}>{children}</div>
+          <div className={icon || title ? 'mt-4' : ''}>{children}</div>
+        </div>
       </div>
     </div>
   )

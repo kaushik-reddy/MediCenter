@@ -4,7 +4,7 @@ import { useShell } from '../../components/shell/shellContext'
 import { TopBar } from '../../components/shell/TopBar'
 import { Card } from '../../components/ui/Card'
 import { Toggle } from '../../components/ui/Toggle'
-import { Modal, Field, ModalActions } from '../../components/ui/Modal'
+import { TravelModeWizard } from '../flows/TravelModeWizard'
 
 export function TravelModePage() {
   const { openDrawer, openModal } = useShell()
@@ -68,7 +68,7 @@ export function TravelModePage() {
         </div>
 
         <button
-          onClick={() => openModal(<ConfigureTravelModal />)}
+          onClick={() => openModal(<TravelModeWizard />)}
           className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-gradient py-3.5 text-[14px] font-bold text-white shadow-md active:scale-[0.98]"
         >
           <Plane size={16} /> Configure Travel Mode
@@ -89,18 +89,7 @@ function Info({ icon, value, label }: { icon: React.ReactNode; value: string; la
   )
 }
 
-function ConfigureTravelModal() {
-  const [dest, setDest] = useState('Dubai, UAE')
-  const [from, setFrom] = useState('')
-  const [to, setTo] = useState('')
-  return (
-    <Modal icon={<Plane size={22} />} title="Configure Travel Mode" subtitle="Set your destination">
-      <Field label="Destination" value={dest} onChange={setDest} placeholder="Where are you going?" />
-      <div className="flex gap-3">
-        <div className="flex-1"><Field label="From" value={from} onChange={setFrom} placeholder="24 May" /></div>
-        <div className="flex-1"><Field label="To" value={to} onChange={setTo} placeholder="31 May" /></div>
-      </div>
-      <ModalActions primaryLabel="Activate" />
-    </Modal>
-  )
+function ConfigureTravelModalRemoved() {
+  return null
 }
+void ConfigureTravelModalRemoved

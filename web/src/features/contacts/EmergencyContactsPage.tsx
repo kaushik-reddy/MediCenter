@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { ShieldCheck, Search, Phone, MessageSquare, MoreVertical, Plus, UserPlus } from 'lucide-react'
+import { ShieldCheck, Search, Phone, MessageSquare, MoreVertical, Plus } from 'lucide-react'
 import { useShell } from '../../components/shell/shellContext'
 import { TopBar } from '../../components/shell/TopBar'
 import { Chips } from '../../components/ui/Chips'
 import { Banner } from '../../components/ui/Banner'
-import { Modal, Field, ModalActions } from '../../components/ui/Modal'
 import { InfoModal } from '../flows/FlowModals'
+import { AddContactWizard } from '../flows/AddContactWizard'
 
 interface Contact {
   id: string
@@ -57,7 +57,7 @@ export function EmergencyContactsPage() {
         </div>
 
         <button
-          onClick={() => openModal(<AddContactModal />)}
+          onClick={() => openModal(<AddContactWizard />)}
           className="flex w-full items-center justify-center gap-1.5 rounded-2xl border-2 border-dashed border-brand-500/40 py-3.5 text-[13.5px] font-bold text-brand-500 active:scale-[0.99]"
         >
           <Plus size={16} /> Add Emergency Contact
@@ -87,19 +87,5 @@ function ContactRow({ c, onAction }: { c: Contact; onAction: (node: React.ReactN
       <button onClick={() => onAction(<InfoModal title={`Message ${c.name}`} message={c.phone} icon={<MessageSquare size={22} />} />)} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-500 active:scale-95"><MessageSquare size={15} /></button>
       <button onClick={() => onAction(<InfoModal title={c.name} message={`${c.rel} · ${c.phone}`} />)} className="grid h-8 w-6 shrink-0 place-items-center text-text-faint"><MoreVertical size={16} /></button>
     </div>
-  )
-}
-
-function AddContactModal() {
-  const [name, setName] = useState('')
-  const [rel, setRel] = useState('')
-  const [phone, setPhone] = useState('')
-  return (
-    <Modal icon={<UserPlus size={22} />} title="Add Contact" subtitle="Add an emergency contact">
-      <Field label="Full Name" value={name} onChange={setName} placeholder="e.g. Anita Reddy" />
-      <Field label="Relationship" value={rel} onChange={setRel} placeholder="e.g. Mother" />
-      <Field label="Phone Number" value={phone} onChange={setPhone} placeholder="+91 98765 43210" />
-      <ModalActions primaryLabel="Save Contact" />
-    </Modal>
   )
 }
