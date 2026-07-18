@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { BOTTOM_TABS } from '../../config/navigation'
 import { useShell } from './shellContext'
-import { AddMedicationModal } from '../../features/flows/FlowModals'
+import { AddMedicationWizard } from '../../features/flows/AddMedicationWizard'
 
 export function BottomNav() {
   const navigate = useNavigate()
@@ -41,7 +41,7 @@ export function BottomNav() {
           <button
             type="button"
             aria-label="Add medication"
-            onClick={() => openModal(<AddMedicationModal />)}
+            onClick={() => openModal(<AddMedicationWizard />)}
             className="absolute left-1/2 top-0 grid h-14 w-14 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-brand-gradient text-white shadow-[0_10px_24px_-6px_rgba(109,79,224,0.7)] ring-4 ring-bg active:scale-95"
           >
             <Plus size={26} strokeWidth={2.5} />
