@@ -15,7 +15,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 const DESKTOP_BREAKPOINT = 1024
 
 /** Compact density for phones, without scaling the fixed navigation. */
-const MOBILE_SCALE = 0.84
+const MOBILE_SCALE = 0.78
 const MOBILE_NAV_RESERVE = 'calc(76px + env(safe-area-inset-bottom))'
 
 interface ViewportRect {
