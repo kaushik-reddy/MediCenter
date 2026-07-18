@@ -7,7 +7,7 @@ struct HomePlaceholderView: View {
     @Environment(AppState.self) private var app
     var body: some View {
         VStack(spacing: 0) {
-            TopBar(title: "Good morning", greeting: true, greetingName: app.userName)
+            TopBar(title: "Good morning, \(app.userName)", greeting: true)
             PlaceholderBody(title: "Home")
         }
     }
