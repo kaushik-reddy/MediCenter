@@ -1,7 +1,8 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { PillKind, ScheduleColor, DayState } from '../data/medicationsData'
 import type { DoseStatus, ScheduleItem, NextDose } from '../data/homeData'
-import type { HistoryRow } from '../data/historyData'
+import type { HistoryRow, HistoryGroup } from '../data/historyData'
+import { sampleMeds, buildSampleHistory } from '../data/sampleData'
 
 /**
  * Unified medication model — the single source of truth shared by every page
@@ -70,6 +71,7 @@ function refillOf(med: Med): RefillView | null {
 
 interface MedStoreValue {
   meds: Med[]
+  history: HistoryGroup[]
   todaySchedule: ScheduleItem[]
   nextDose: NextDose | null
   refill: RefillView[]
@@ -83,6 +85,8 @@ interface MedStoreValue {
   addMedication: (input: { name: string; form?: string; dosage?: string; supplement?: boolean }) => void
   deleteMedication: (id: string) => void
   reorder: (id: string) => void
+  loadSampleData: () => void
+  clearAll: () => void
 }
 
 const MedStore = createContext<MedStoreValue | undefined>(undefined)
@@ -95,8 +99,56 @@ const KIND_FROM_FORM: Record<string, PillKind> = {
   Other: 'tablet',
 }
 
+const MEDS_KEY = 'medicenter.meds'
+const HISTORY_KEY = 'medicenter.history'
+
+function loadMeds(): Med[] {
+  try {
+    const raw = localStorage.getItem(MEDS_KEY)
+    return raw ? (JSON.parse(raw) as Med[]) : SEED
+  } catch {
+    return SEED
+  }
+}
+
+function loadHistory(): HistoryGroup[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY)
+    return raw ? (JSON.parse(raw) as HistoryGroup[]) : []
+  } catch {
+    return []
+  }
+}
+
 export function MedProvider({ children }: { children: ReactNode }) {
-  const [meds, setMeds] = useState<Med[]>(SEED)
+  const [meds, setMeds] = useState<Med[]>(loadMeds)
+  const [history, setHistory] = useState<HistoryGroup[]>(loadHistory)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(MEDS_KEY, JSON.stringify(meds))
+    } catch {
+      /* ignore quota errors */
+    }
+  }, [meds])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history))
+    } catch {
+      /* ignore quota errors */
+    }
+  }, [history])
+
+  const loadSampleData = useCallback(() => {
+    setMeds(sampleMeds.map((m) => ({ ...m })))
+    setHistory(buildSampleHistory(30))
+  }, [])
+
+  const clearAll = useCallback(() => {
+    setMeds([])
+    setHistory([])
+  }, [])
 
   const markTaken = useCallback((id: string) => {
     setMeds((prev) =>
@@ -187,8 +239,8 @@ export function MedProvider({ children }: { children: ReactNode }) {
     const takenCount = meds.filter((m) => m.status === 'taken').length
     const pendingCount = meds.filter((m) => m.status !== 'taken').length
 
-    return { meds, todaySchedule, nextDose, refill, todayLog, takenCount, pendingCount, markTaken, skipDose, snoozeDose, rescheduleDose, addMedication, deleteMedication, reorder }
-  }, [meds, markTaken, skipDose, snoozeDose, rescheduleDose, addMedication, deleteMedication, reorder])
+    return { meds, history, todaySchedule, nextDose, refill, todayLog, takenCount, pendingCount, markTaken, skipDose, snoozeDose, rescheduleDose, addMedication, deleteMedication, reorder, loadSampleData, clearAll }
+  }, [meds, history, markTaken, skipDose, snoozeDose, rescheduleDose, addMedication, deleteMedication, reorder, loadSampleData, clearAll])
 
   return <MedStore.Provider value={value}>{children}</MedStore.Provider>
 }

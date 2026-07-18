@@ -14,6 +14,8 @@ import {
   Headphones,
   Info,
   ChevronRight,
+  FlaskConical,
+  Trash2,
 } from 'lucide-react'
 import { useShell } from '../../components/shell/shellContext'
 import { useTheme } from '../../theme/ThemeProvider'
@@ -23,11 +25,39 @@ import { SettingsGroup, SettingsRow, SettingsSectionLabel } from '../../componen
 import { Modal, ModalActions } from '../../components/ui/Modal'
 import { NotificationChannelsModal, InfoModal } from '../flows/FlowModals'
 import { CheckCircle2 } from 'lucide-react'
+import { useMeds } from '../../store/medStore'
+import { useNotifications } from '../../store/notificationStore'
 
 export function SettingsPage() {
   const { openDrawer, openModal } = useShell()
   const { resolved, toggle } = useTheme()
   const navigate = useNavigate()
+  const { loadSampleData, clearAll } = useMeds()
+  const { loadSample: loadSampleNotifications, clear: clearNotifications } = useNotifications()
+
+  const loadSample = () => {
+    loadSampleData()
+    loadSampleNotifications()
+    openModal(
+      <InfoModal
+        title="Sample data loaded"
+        message="Loaded 12 medications, 30 days of history and 20 notifications for stress testing."
+        icon={<FlaskConical size={22} />}
+      />,
+    )
+  }
+
+  const clearData = () => {
+    clearAll()
+    clearNotifications()
+    openModal(
+      <InfoModal
+        title="All data cleared"
+        message="Medications, history and notifications have been reset to empty."
+        icon={<Trash2 size={22} />}
+      />,
+    )
+  }
 
   return (
     <div className="flex min-h-full flex-col">
@@ -73,6 +103,14 @@ export function SettingsPage() {
           <SettingsGroup>
             <SettingsRow icon={CloudUpload} title="Backup & Restore" subtitle="Keep your data safe" onClick={() => openModal(<InfoModal title="Backup & Restore" message="Back up your data locally or restore from a previous backup." />)} />
             <SettingsRow icon={ShieldCheck} title="Privacy & Security" subtitle="App lock, encryption and more" onClick={() => openModal(<InfoModal title="Privacy & Security" message="Enable app lock and encryption to protect your health data." />)} last />
+          </SettingsGroup>
+        </div>
+
+        <div>
+          <SettingsSectionLabel>Developer</SettingsSectionLabel>
+          <SettingsGroup>
+            <SettingsRow icon={FlaskConical} title="Load Sample Data" subtitle="30 days of meds, history & notifications" onClick={loadSample} />
+            <SettingsRow icon={Trash2} title="Clear All Data" subtitle="Reset the app back to empty" onClick={clearData} last />
           </SettingsGroup>
         </div>
 

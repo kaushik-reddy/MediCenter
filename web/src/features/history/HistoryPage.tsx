@@ -7,22 +7,34 @@ import { FilterModal, PeriodModal, DateRangeModal } from '../flows/FlowModals'
 import { useMeds } from '../../store/medStore'
 import {
   historySummary,
-  historyGroups,
   type HistoryGroup,
   type HistoryRow,
 } from '../../data/historyData'
 
 export function HistoryPage() {
   const { openDrawer } = useShell()
-  const { todayLog } = useMeds()
-  const todayGroup: HistoryGroup = {
-    label: 'Today',
-    date: historyGroups[0]?.date ?? 'Today',
-    rows: todayLog,
-  }
-  const groups: HistoryGroup[] = [todayGroup, ...historyGroups.filter((g) => g.label !== 'Today')].filter(
-    (g) => g.rows.length > 0,
-  )
+  const { todayLog, history } = useMeds()
+  const groups: HistoryGroup[] =
+    history.length > 0
+      ? history
+      : [{ label: 'Today', date: 'Today', rows: todayLog }].filter((g) => g.rows.length > 0)
+
+  const summary = (() => {
+    const rows = groups.flatMap((g) => g.rows)
+    if (rows.length === 0) return historySummary
+    const taken = rows.filter((r) => r.status === 'on-time').length
+    const late = rows.filter((r) => r.status === 'late').length
+    const missed = rows.filter((r) => r.status === 'missed').length
+    const total = rows.length
+    return {
+      period: history.length > 1 ? `Last ${history.length} days` : 'This Week',
+      percent: total ? Math.round((taken / total) * 100) : 0,
+      taken,
+      late,
+      missed,
+      dosesText: `${taken + late} of ${total} doses taken`,
+    }
+  })()
   return (
     <div className="flex min-h-full flex-col">
       <TopBar
@@ -33,7 +45,7 @@ export function HistoryPage() {
       />
 
       <div className="space-y-3 px-4 pt-1">
-        <SummaryCard />
+        <SummaryCard summary={summary} />
         <SearchRow />
         {groups.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-[18px] bg-surface px-6 py-12 text-center ring-1 ring-border">
@@ -54,9 +66,9 @@ export function HistoryPage() {
   )
 }
 
-function SummaryCard() {
+function SummaryCard({ summary }: { summary: typeof historySummary }) {
   const { openModal } = useShell()
-  const s = historySummary
+  const s = summary
   return (
     <div className="rounded-[18px] bg-brand-soft p-4">
       <div className="flex gap-4">
