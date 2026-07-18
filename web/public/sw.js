@@ -1,6 +1,6 @@
 // MediCenter service worker — network-first so the app is always up to date
 // when online, with an offline fallback cache.
-const CACHE = 'medicenter-cache-v12'
+const CACHE = 'medicenter-cache-v13'
 
 self.addEventListener('install', () => {
   self.skipWaiting()

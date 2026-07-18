@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Search, SlidersHorizontal, Pill, Leaf } from 'lucide-react'
 import { useShell } from '../../components/shell/shellContext'
 import { TopBar } from '../../components/shell/TopBar'
@@ -6,12 +7,13 @@ import { MedicationCard } from './MedicationCard'
 import { RefillCarousel } from './RefillCarousel'
 import { TipOfDay } from '../home/TipOfDay'
 import { useMeds } from '../../store/medStore'
-import { MedicationOptionsModal, FilterModal } from '../flows/FlowModals'
+import { FilterModal } from '../flows/FlowModals'
 type Tab = 'medications' | 'supplements'
 
 export function MedicationsPage() {
   const { openDrawer, openModal } = useShell()
   const { meds } = useMeds()
+  const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>('medications')
   const [query, setQuery] = useState('')
 
@@ -71,7 +73,7 @@ export function MedicationsPage() {
         {/* Medication list */}
         <div className="space-y-3">
           {filtered.map((med) => (
-            <MedicationCard key={med.id} med={med} onClick={() => openModal(<MedicationOptionsModal name={med.name} medId={med.id} />)} />
+            <MedicationCard key={med.id} med={med} onClick={() => navigate(`/medications/${med.id}`)} />
           ))}
           {filtered.length === 0 && (
             <p className="rounded-2xl bg-surface py-8 text-center text-[13px] text-text-muted ring-1 ring-border">

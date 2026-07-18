@@ -7,6 +7,7 @@ import { AppShell } from './components/shell/AppShell'
 import { PlaceholderPage } from './routes/PlaceholderPage'
 import { HomePage } from './features/home/HomePage'
 import { MedicationsPage } from './features/medications/MedicationsPage'
+import { MedicineDetailPage } from './features/medications/MedicineDetailPage'
 import { CalendarPage } from './features/calendar/CalendarPage'
 import { HistoryPage } from './features/history/HistoryPage'
 import { ProfilePage } from './features/profile/ProfilePage'
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       // Core bottom-nav tabs
       { path: '/', element: <HomePage /> },
       { path: '/medications', element: <MedicationsPage /> },
+      { path: '/medications/:id', element: <MedicineDetailPage /> },
       { path: '/calendar', element: <CalendarPage /> },
       { path: '/history', element: <HistoryPage /> },
       { path: '/add', element: <PlaceholderPage title="Add Medication" /> },
