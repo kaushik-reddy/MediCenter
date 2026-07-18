@@ -1,13 +1,12 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 
 /**
  * App shell layout.
  *
  * Mobile / PWA (the important case):
- *   - The shell is sized/positioned from `window.visualViewport`, which reports
- *     the true visible area (excluding the browser's top/bottom toolbars and the
- *     on-screen keyboard). This keeps the bottom nav glued to the real visible
- *     bottom edge in the browser AND when installed as a PWA, at any height.
+ *   - The shell is a `fixed inset-0` element, so top:0 AND bottom:0 pin it to the
+ *     real viewport edges (no measured height that iOS can under-report). The
+ *     bottom nav sits at the shell's bottom edge = the true bottom of the screen.
  *   - Compact density applies only to the scrollable page layer (never the nav).
  *
  * Desktop: the same column inside a centered, phone-sized device frame (no scaling).
@@ -17,23 +16,6 @@ const DESKTOP_BREAKPOINT = 1024
 /** Compact density for phones, without scaling the fixed navigation. */
 const MOBILE_SCALE = 0.78
 const MOBILE_NAV_RESERVE = 'calc(76px + env(safe-area-inset-bottom))'
-
-interface ViewportRect {
-  width: number
-  height: number
-  offsetTop: number
-  offsetLeft: number
-}
-
-function readViewport(): ViewportRect {
-  const vv = typeof window !== 'undefined' ? window.visualViewport : null
-  return {
-    width: Math.round(vv?.width ?? window.innerWidth),
-    height: Math.round(vv?.height ?? window.innerHeight),
-    offsetTop: Math.round(vv?.offsetTop ?? 0),
-    offsetLeft: Math.round(vv?.offsetLeft ?? 0),
-  }
-}
 
 export function DeviceViewport({
   children,
@@ -47,28 +29,15 @@ export function DeviceViewport({
   const [isDesktop, setIsDesktop] = useState(
     typeof window !== 'undefined' ? window.innerWidth >= DESKTOP_BREAKPOINT : false,
   )
-  const [vp, setVp] = useState<ViewportRect>(() =>
-    typeof window !== 'undefined'
-      ? readViewport()
-      : { width: 390, height: 844, offsetTop: 0, offsetLeft: 0 },
-  )
 
   useEffect(() => {
-    const update = () => {
-      setIsDesktop(window.innerWidth >= DESKTOP_BREAKPOINT)
-      setVp(readViewport())
-    }
+    const update = () => setIsDesktop(window.innerWidth >= DESKTOP_BREAKPOINT)
     update()
     window.addEventListener('resize', update)
     window.addEventListener('orientationchange', update)
-    const vv = window.visualViewport
-    vv?.addEventListener('resize', update)
-    vv?.addEventListener('scroll', update)
     return () => {
       window.removeEventListener('resize', update)
       window.removeEventListener('orientationchange', update)
-      vv?.removeEventListener('resize', update)
-      vv?.removeEventListener('scroll', update)
     }
   }, [])
 
@@ -87,18 +56,10 @@ export function DeviceViewport({
     )
   }
 
-  // Mobile: the shell exactly matches the visible viewport, so the nav at its
-  // bottom edge is always glued to the real visible bottom of the screen.
-  const shellStyle: CSSProperties = {
-    position: 'fixed',
-    left: vp.offsetLeft,
-    top: vp.offsetTop,
-    width: vp.width,
-    height: vp.height,
-  }
-
+  // Mobile: `fixed inset-0` fills the true viewport top-to-bottom, so the nav
+  // at the shell's bottom edge is always glued to the real bottom of the screen.
   return (
-    <div className="overflow-hidden bg-bg" style={shellStyle}>
+    <div className="fixed inset-0 overflow-hidden bg-bg">
       <div
         data-app-scroll
         className="no-scrollbar absolute inset-x-0 top-0 overflow-y-auto overflow-x-hidden"
