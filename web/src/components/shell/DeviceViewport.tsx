@@ -15,7 +15,7 @@ const DESKTOP_BREAKPOINT = 1024
 
 /** Compact density for phones, without scaling the fixed navigation. */
 const MOBILE_SCALE = 0.78
-const MOBILE_NAV_RESERVE = 'calc(76px + env(safe-area-inset-bottom))'
+const MOBILE_NAV_RESERVE = 'calc(90px + env(safe-area-inset-bottom))'
 
 export function DeviceViewport({
   children,

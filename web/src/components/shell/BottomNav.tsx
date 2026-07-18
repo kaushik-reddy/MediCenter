@@ -18,10 +18,10 @@ export function BottomNav() {
   return (
     <nav className="w-full shrink-0">
       <div
-        className="relative w-full px-4"
-        style={{ paddingBottom: '0px' }}
+        className="relative w-full px-3"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.6rem)' }}
       >
-        <div className="relative mx-2 flex items-center justify-between rounded-[28px] bg-surface px-4 py-2.5 shadow-[var(--shadow-float)] ring-1 ring-border">
+        <div className="relative mx-1 flex items-center justify-between rounded-[28px] bg-surface px-4 py-2.5 shadow-[var(--shadow-float)] ring-1 ring-border">
           <div className="flex flex-1 justify-around">
             {left.map((tab) => (
               <TabButton key={tab.key} tab={tab} active={isActive(tab.path)} onClick={() => navigate(tab.path)} />
