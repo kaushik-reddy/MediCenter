@@ -181,11 +181,36 @@ body {
   }
 }
 
-/* Smooth page entrance — replays on every route change (keyed in AppShell). */
+/* Smooth page entrance — replays on every route change (keyed in AppShell).
+   Gentle "focus in": fades + rises + comes out of a slight blur/scale so pages
+   settle in softly instead of hard-cutting. */
 @keyframes pageIn {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+    filter: blur(3px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.page-enter {
+  animation: pageIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: opacity, transform, filter;
+}
+
+/* Content sections ease in just behind the page for a soft, staggered load.
+   Scoped to the page's top-level content sections only (not nested lists). */
+@keyframes sectionIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -193,13 +218,20 @@ body {
   }
 }
 
-.page-enter {
-  animation: pageIn 0.34s cubic-bezier(0.22, 0.7, 0.2, 1) both;
-  will-change: opacity, transform;
+.page-enter > div > div > * {
+  animation: sectionIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+.page-enter > div > div > *:nth-child(1) { animation-delay: 0.05s; }
+.page-enter > div > div > *:nth-child(2) { animation-delay: 0.11s; }
+.page-enter > div > div > *:nth-child(3) { animation-delay: 0.17s; }
+.page-enter > div > div > *:nth-child(4) { animation-delay: 0.22s; }
+.page-enter > div > div > *:nth-child(n + 5) { animation-delay: 0.27s; }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-enter {
+  .page-enter,
+  .page-enter > div > div > * {
     animation: none;
   }
 }
+
+
