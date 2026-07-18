@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { Menu, Bell, User } from 'lucide-react'
 import { useNotifications } from '../../store/notificationStore'
+import { useProfile } from '../../store/profileStore'
 
 interface TopBarProps {
   title: string
@@ -19,6 +20,7 @@ export function TopBar({
   variant = 'title',
 }: TopBarProps) {
   const { unreadCount } = useNotifications()
+  const { profile } = useProfile()
   const notificationCount = unreadCount
   return (
     <header
@@ -65,9 +67,17 @@ export function TopBar({
         </NavLink>
 
         <NavLink to="/profile" aria-label="Profile" className="shrink-0 active:scale-95">
-          <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-surface bg-surface-2 text-text-faint shadow-[var(--shadow-card)]">
-            <User size={17} />
-          </span>
+          {profile.avatar ? (
+            <img
+              src={profile.avatar}
+              alt="Profile"
+              className="h-9 w-9 rounded-full border-2 border-surface object-cover shadow-[var(--shadow-card)]"
+            />
+          ) : (
+            <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-surface bg-surface-2 text-text-faint shadow-[var(--shadow-card)]">
+              <User size={17} />
+            </span>
+          )}
         </NavLink>
       </div>
     </header>

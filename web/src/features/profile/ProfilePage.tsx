@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   Pencil,
   CalendarDays,
@@ -26,6 +26,8 @@ import { useShell } from '../../components/shell/shellContext'
 import { TopBar } from '../../components/shell/TopBar'
 import { useTheme } from '../../theme/ThemeProvider'
 import { useMeds } from '../../store/medStore'
+import { useProfile } from '../../store/profileStore'
+import { fileToAvatarDataUrl } from '../../lib/image'
 import { SettingsGroup, SettingsRow, SettingsSectionLabel } from '../../components/ui/SettingsRow'
 import { Toggle } from '../../components/ui/Toggle'
 import { Modal, Field, ModalActions } from '../../components/ui/Modal'
@@ -129,22 +131,67 @@ export function ProfilePage() {
   )
 }
 
+function AvatarUpload({ variant }: { variant: 'card' | 'modal' }) {
+  const { profile, setAvatar } = useProfile()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const pick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.currentTarget.value = ''
+    if (!file) return
+    try {
+      setAvatar(await fileToAvatarDataUrl(file))
+    } catch {
+      /* ignore unreadable images */
+    }
+  }
+
+  const box = variant === 'card' ? 'h-16 w-16 border-[3px]' : 'h-20 w-20 border-4'
+  const iconSize = variant === 'card' ? 28 : 32
+  const border = variant === 'card' ? 'border-white dark:border-white/10' : 'border-surface'
+  const badge = variant === 'card' ? 'h-6 w-6 ring-brand-soft' : 'h-7 w-7 ring-surface'
+
+  return (
+    <div className="relative shrink-0">
+      {profile.avatar ? (
+        <img
+          src={profile.avatar}
+          alt="Profile"
+          className={`${box} ${border} rounded-full object-cover shadow`}
+        />
+      ) : (
+        <span className={`${box} ${border} grid place-items-center rounded-full bg-surface text-text-faint shadow`}>
+          <User size={iconSize} />
+        </span>
+      )}
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        aria-label="Change profile picture"
+        className={`${badge} absolute -bottom-1 -right-1 grid place-items-center rounded-full bg-brand-500 text-white ring-2 active:scale-95`}
+      >
+        <Camera />
+      </button>
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={pick} />
+    </div>
+  )
+}
+
 function ProfileCard({ onEdit }: { onEdit: () => void }) {
   const { meds } = useMeds()
+  const { profile } = useProfile()
   return (
     <div className="rounded-[20px] bg-brand-soft p-4">
       <div className="flex items-start gap-3">
-        <div className="relative shrink-0">
-          <span className="grid h-16 w-16 place-items-center rounded-full border-[3px] border-white bg-surface text-text-faint shadow dark:border-white/10">
-            <User size={28} />
-          </span>
-          <span className="absolute -bottom-0.5 -right-0.5 grid h-6 w-6 place-items-center rounded-full bg-brand-500 text-white ring-2 ring-brand-soft">
-            <Camera />
-          </span>
-        </div>
+        <AvatarUpload variant="card" />
         <div className="min-w-0 flex-1">
-          <h2 className="text-[18px] font-bold text-text">Your Name</h2>
-          <p className="truncate text-[12.5px] text-text-muted">Tap edit to add your details</p>
+          <h2 className="truncate text-[18px] font-bold text-text">{profile.name || 'Your Name'}</h2>
+          <p className="truncate text-[12.5px] text-text-muted">
+            {profile.email || 'Tap edit to add your details'}
+          </p>
+          {profile.phone && (
+            <p className="truncate text-[12.5px] text-text-muted">{profile.phone}</p>
+          )}
         </div>
         <button
           onClick={onEdit}
@@ -250,9 +297,11 @@ function LanguageModal() {
 }
 
 function EditProfileModal() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
+  const { profile, setProfile } = useProfile()
+  const { closeModal } = useShell()
+  const [name, setName] = useState(profile.name)
+  const [email, setEmail] = useState(profile.email)
+  const [phone, setPhone] = useState(profile.phone)
   return (
     <Modal
       icon={<Pencil size={22} />}
@@ -260,19 +309,18 @@ function EditProfileModal() {
       subtitle="Update your personal information"
     >
       <div className="mb-4 flex justify-center">
-        <div className="relative">
-          <span className="grid h-20 w-20 place-items-center rounded-full border-4 border-surface bg-surface-2 text-text-faint">
-            <User size={32} />
-          </span>
-          <span className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full bg-brand-500 text-white ring-2 ring-surface">
-            <Camera />
-          </span>
-        </div>
+        <AvatarUpload variant="modal" />
       </div>
       <Field label="Full Name" value={name} onChange={setName} placeholder="Enter your name" />
       <Field label="Email" value={email} onChange={setEmail} type="email" placeholder="you@example.com" />
       <Field label="Phone Number" value={phone} onChange={setPhone} placeholder="Add phone number" />
-      <ModalActions primaryLabel="Save Changes" />
+      <ModalActions
+        primaryLabel="Save Changes"
+        onPrimary={() => {
+          setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() })
+          closeModal()
+        }}
+      />
     </Modal>
   )
 }

@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { ThemeProvider } from './theme/ThemeProvider'
 import { MedProvider } from './store/medStore'
 import { NotificationProvider } from './store/notificationStore'
+import { ProfileProvider } from './store/profileStore'
 import { AppShell } from './components/shell/AppShell'
 import { PlaceholderPage } from './routes/PlaceholderPage'
 import { HomePage } from './features/home/HomePage'
@@ -56,11 +57,13 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <ThemeProvider>
-      <MedProvider>
-        <NotificationProvider>
-          <RouterProvider router={router} />
-        </NotificationProvider>
-      </MedProvider>
+      <ProfileProvider>
+        <MedProvider>
+          <NotificationProvider>
+            <RouterProvider router={router} />
+          </NotificationProvider>
+        </MedProvider>
+      </ProfileProvider>
     </ThemeProvider>
   )
 }

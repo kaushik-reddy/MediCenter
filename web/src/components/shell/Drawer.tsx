@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { X, Moon, Sun, LogOut, HeartPulse, User } from 'lucide-react'
 import { DRAWER_GROUPS } from '../../config/navigation'
 import { useTheme } from '../../theme/ThemeProvider'
+import { useProfile } from '../../store/profileStore'
 import { APP_VERSION } from '../../version'
 
 interface DrawerProps {
@@ -14,6 +15,7 @@ export function Drawer({ open, onClose }: DrawerProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { resolved, toggle } = useTheme()
+  const { profile } = useProfile()
 
   // Close on route change
   useEffect(() => {
@@ -82,12 +84,16 @@ export function Drawer({ open, onClose }: DrawerProps) {
             onClick={() => navigate('/profile')}
             className="flex w-full items-center gap-3 rounded-2xl bg-white/15 p-3 text-left active:scale-[0.99]"
           >
-            <span className="grid h-11 w-11 place-items-center rounded-full border-2 border-white/60 bg-white/15">
-              <User size={20} />
+            <span className="grid h-11 w-11 place-items-center overflow-hidden rounded-full border-2 border-white/60 bg-white/15">
+              {profile.avatar ? (
+                <img src={profile.avatar} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                <User size={20} />
+              )}
             </span>
             <div className="min-w-0">
-              <p className="truncate font-semibold">Your Name</p>
-              <p className="truncate text-xs text-white/80">Tap to set up profile</p>
+              <p className="truncate font-semibold">{profile.name || 'Your Name'}</p>
+              <p className="truncate text-xs text-white/80">{profile.email || 'Tap to set up profile'}</p>
             </div>
           </button>
         </div>
