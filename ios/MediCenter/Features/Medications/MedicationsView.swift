@@ -15,7 +15,7 @@ struct MedicationsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TopBar(title: "Medications 💊", subtitle: "Manage all your medicines in one place.")
+            TopBar(title: "Medications", subtitle: "Manage all your medicines in one place.")
 
             ScrollView {
                 VStack(spacing: 12) {

@@ -7,7 +7,7 @@ struct ProfileView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            TopBar(title: "Profile 👤", subtitle: "Manage your account and preferences.")
+            TopBar(title: "Profile", subtitle: "Manage your account and preferences.")
             ScrollView {
                 VStack(spacing: 16) {
                     profileCard

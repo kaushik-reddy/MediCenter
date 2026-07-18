@@ -10,12 +10,17 @@ struct TopBar: View {
 
     var body: some View {
         HStack(spacing: 10) {
+            // On a pushed page show a back button; on a root tab show the hamburger.
             Button {
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                    app.isDrawerOpen = true
+                if app.navigationPath.isEmpty {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                        app.isDrawerOpen = true
+                    }
+                } else {
+                    app.goBack()
                 }
             } label: {
-                Image(systemName: "line.3.horizontal")
+                Image(systemName: app.navigationPath.isEmpty ? "line.3.horizontal" : "chevron.left")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(Theme.text)
                     .frame(width: 36, height: 36)

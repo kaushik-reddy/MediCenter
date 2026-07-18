@@ -31,4 +31,11 @@ final class AppState {
         isDrawerOpen = false
         navigationPath.append(route)
     }
+
+    /// Pop the current pushed page (used by the top-bar back button).
+    func goBack() {
+        if !navigationPath.isEmpty {
+            navigationPath.removeLast()
+        }
+    }
 }

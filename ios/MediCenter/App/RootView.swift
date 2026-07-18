@@ -44,21 +44,24 @@ struct RootView: View {
             }
             .animation(.easeOut(duration: 0.2), value: app.modal != nil)
             .navigationDestination(for: AppRoute.self) { route in
-                switch route {
-                case .profile: ProfileView()
-                case .reminders: RemindersView()
-                case .notifications: NotificationsView()
-                case .inventory: InventoryView()
-                case .analytics: AnalyticsView()
-                case .insights: HealthInsightsView()
-                case .reports: HealthReportsView()
-                case .visits: DoctorVisitsView()
-                case .interactions: InteractionCheckerView()
-                case .caregiver: CaregiverView()
-                case .contacts: EmergencyContactsView()
-                case .travel: TravelModeView()
-                case .settings: SettingsView()
+                Group {
+                    switch route {
+                    case .profile: ProfileView()
+                    case .reminders: RemindersView()
+                    case .notifications: NotificationsView()
+                    case .inventory: InventoryView()
+                    case .analytics: AnalyticsView()
+                    case .insights: HealthInsightsView()
+                    case .reports: HealthReportsView()
+                    case .visits: DoctorVisitsView()
+                    case .interactions: InteractionCheckerView()
+                    case .caregiver: CaregiverView()
+                    case .contacts: EmergencyContactsView()
+                    case .travel: TravelModeView()
+                    case .settings: SettingsView()
+                    }
                 }
+                .toolbar(.hidden, for: .navigationBar)
             }
         }
     }

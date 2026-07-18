@@ -6,7 +6,7 @@ struct HomeView: View {
     var body: some View {
         VStack(spacing: 0) {
             TopBar(
-                title: "Good morning, \(app.userName) 👋",
+                title: "Good morning, \(app.userName)",
                 subtitle: "Stay on track, stay healthy.",
                 greeting: true
             )

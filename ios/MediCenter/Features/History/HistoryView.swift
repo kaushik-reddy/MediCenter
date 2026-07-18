@@ -3,7 +3,7 @@ import SwiftUI
 struct HistoryView: View {
     var body: some View {
         VStack(spacing: 0) {
-            TopBar(title: "History 🕐", subtitle: "Your medication history and activity.")
+            TopBar(title: "History", subtitle: "Your medication history and activity.")
             ScrollView {
                 VStack(spacing: 12) {
                     SummaryCard()
