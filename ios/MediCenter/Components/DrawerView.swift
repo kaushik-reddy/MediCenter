@@ -10,11 +10,13 @@ struct DrawerView: View {
     var body: some View {
         ZStack(alignment: .leading) {
             if app.isDrawerOpen {
-                // Scrim
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-                    .onTapGesture { close() }
+                // Frosted scrim
+                ZStack {
+                    Rectangle().fill(.ultraThinMaterial).ignoresSafeArea()
+                    Color.black.opacity(0.18).ignoresSafeArea()
+                }
+                .transition(.opacity)
+                .onTapGesture { close() }
 
                 panel
                     .frame(width: width)

@@ -24,9 +24,7 @@ struct TopBar: View {
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(Theme.text)
                     .frame(width: 36, height: 36)
-                    .background(Theme.surface)
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.06), radius: 8, y: 3)
+                    .glassCircle()
             }
 
             VStack(alignment: .leading, spacing: 1) {
@@ -63,9 +61,7 @@ struct TopBar: View {
                         .font(.system(size: 17, weight: .medium))
                         .foregroundStyle(Theme.text)
                         .frame(width: 36, height: 36)
-                        .background(Theme.surface)
-                        .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.06), radius: 8, y: 3)
+                        .glassCircle()
                     if app.notificationCount > 0 {
                         Text("\(app.notificationCount)")
                             .font(.system(size: 9, weight: .bold))

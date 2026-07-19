@@ -33,7 +33,8 @@ struct RootView: View {
             }            .overlay {
                 if let modal = app.modal {
                     ZStack {
-                        Color.black.opacity(0.45).ignoresSafeArea()
+                        Rectangle().fill(.ultraThinMaterial).ignoresSafeArea()
+                        Color.black.opacity(0.18).ignoresSafeArea()
                             .onTapGesture { app.dismissModal() }
                         modal
                             .padding(.horizontal, 24)
@@ -93,15 +94,7 @@ struct CustomTabBar: View {
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 10)
-            .background(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(Theme.surface)
-                    .shadow(color: .black.opacity(0.12), radius: 20, x: 0, y: 8)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .strokeBorder(Theme.border, lineWidth: 1)
-            )
+            .glass(28)
             .padding(.horizontal, 16)
 
             // Center + FAB
