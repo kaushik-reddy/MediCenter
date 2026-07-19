@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct EmergencyContactsView: View {
+    @Environment(AppState.self) private var app
     @State private var chip = "All"
     struct Contact: Identifiable { let id = UUID(); let name: String; let rel: String; let phone: String; let primary: Bool; var order: Int? = nil }
     private let primaryC = [
@@ -24,7 +25,7 @@ struct EmergencyContactsView: View {
                     ForEach(primaryC) { c in row(c) }
                     Text("Secondary Contacts").font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.text).frame(maxWidth: .infinity, alignment: .leading)
                     ForEach(secondaryC) { c in row(c) }
-                    Button {} label: {
+                    Button { app.presentFullScreen(AddContactWizardView()) } label: {
                         HStack(spacing: 6) { Image(systemName: "plus"); Text("Add Emergency Contact").font(.system(size: 13.5, weight: .bold)) }
                             .foregroundStyle(Theme.brand500).frame(maxWidth: .infinity).padding(.vertical, 14)
                             .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [5])).foregroundStyle(Theme.brand500.opacity(0.4)))
