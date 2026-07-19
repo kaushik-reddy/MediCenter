@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct CaregiverView: View {
+    @Environment(AppState.self) private var app
     @State private var chip = "All"
     struct Person: Identifiable { let id = UUID(); let name: String; let attention: Bool; let meds: Int; let updated: String; let missed: Int; let late: Int; let taken: Int }
     private let people = [
@@ -48,11 +49,11 @@ struct CaregiverView: View {
                 mini("checkmark", p.taken, "Taken", Theme.greenSoft, Theme.green)
             }
             HStack(spacing: 8) {
-                Button {} label: {
+                Button { app.present(SendReminderModal(name: p.name)) } label: {
                     Text("Send Reminder").font(.system(size: 12.5, weight: .bold)).foregroundStyle(.white)
                         .frame(maxWidth: .infinity).padding(.vertical, 10).background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                Button {} label: {
+                Button { app.present(InfoModal(title: p.name, message: "\(p.meds) medications · \(p.taken) taken, \(p.late) late, \(p.missed) missed today.")) } label: {
                     HStack(spacing: 4) { Text("View Details").font(.system(size: 12.5, weight: .semibold)); Image(systemName: "chevron.right").font(.system(size: 12)) }
                         .foregroundStyle(Theme.text).padding(.horizontal, 12).padding(.vertical, 10)
                         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Theme.border, lineWidth: 1))

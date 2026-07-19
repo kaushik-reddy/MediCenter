@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct HealthReportsView: View {
+    @Environment(AppState.self) private var app
     var body: some View {
         VStack(spacing: 0) {
             TopBar(title: "Health Reports", subtitle: "Your health, in detail")
@@ -31,12 +32,12 @@ struct HealthReportsView: View {
                         }
                     }
                     HStack(spacing: 12) {
-                        Button {} label: {
+                        Button { app.present(ExportReportModal()) } label: {
                             HStack(spacing: 8) { Image(systemName: "arrow.down.circle"); Text("Export").font(.system(size: 14, weight: .bold)) }
                                 .foregroundStyle(Theme.text).frame(maxWidth: .infinity).padding(.vertical, 12)
                                 .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Theme.border, lineWidth: 1))
                         }
-                        Button {} label: {
+                        Button { app.present(ShareReportModal()) } label: {
                             HStack(spacing: 8) { Image(systemName: "square.and.arrow.up"); Text("Share Report").font(.system(size: 14, weight: .bold)) }
                                 .foregroundStyle(.white).frame(maxWidth: .infinity).padding(.vertical, 12)
                                 .background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 16))

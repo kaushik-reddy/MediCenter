@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct InteractionCheckerView: View {
+    @Environment(AppState.self) private var app
     struct Recent: Identifiable { let id = UUID(); let pair: String; let ago: String; let risk: String; let tone: Color }
     private let recent = [
         Recent(pair: "Paracetamol + Ibuprofen", ago: "2 days ago", risk: "High Risk", tone: Theme.red),
@@ -21,12 +22,12 @@ struct InteractionCheckerView: View {
                             }
                             medRow("Paracetamol 650mg", "Tablet")
                             medRow("Ibuprofen 400mg", "Tablet")
-                            Button {} label: {
+                            Button { app.present(InfoModal(icon: "plus", title: "Add Medicine", message: "Search and add another medicine to check for interactions.")) } label: {
                                 HStack(spacing: 6) { Image(systemName: "plus"); Text("Add Another Medicine").font(.system(size: 13, weight: .semibold)) }
                                     .foregroundStyle(Theme.textMuted).frame(maxWidth: .infinity).padding(.vertical, 10)
                                     .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [5])).foregroundStyle(Theme.border))
                             }
-                            Button {} label: {
+                            Button { app.present(InteractionResultModal()) } label: {
                                 HStack(spacing: 8) { Image(systemName: "magnifyingglass"); Text("Check Interactions").font(.system(size: 14, weight: .bold)) }
                                     .foregroundStyle(.white).frame(maxWidth: .infinity).padding(.vertical, 12)
                                     .background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 16))

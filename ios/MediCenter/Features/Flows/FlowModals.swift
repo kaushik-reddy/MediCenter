@@ -428,6 +428,147 @@ struct LogoutModal: View {
     }
 }
 
+struct SendReminderModal: View {
+    var name: String = ""
+    @State private var message = "Time for your medicine! Please don't forget to take it."
+    var body: some View {
+        ModalCard(icon: "paperplane", title: "Send Reminder", subtitle: name.isEmpty ? "Send a gentle nudge" : "Remind \(name)") {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Message").font(.system(size: 12.5, weight: .semibold)).foregroundStyle(Theme.textMuted)
+                TextField("", text: $message, axis: .vertical).lineLimit(2...4).font(.system(size: 13.5))
+                    .padding(12).background(Theme.surface2).clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .padding(.bottom, 12)
+            ModalActions(primaryLabel: "Send Reminder")
+        }
+    }
+}
+
+struct InteractionResultModal: View {
+    var body: some View {
+        ModalCard(icon: "exclamationmark.triangle.fill", iconBg: Theme.redSoft, iconFg: Theme.red,
+                  title: "High Risk Interaction", subtitle: "Paracetamol + Ibuprofen") {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Taking these together may increase the risk of stomach irritation and bleeding. Consult your doctor before combining.")
+                    .font(.system(size: 12.5)).foregroundStyle(Theme.text)
+                    .padding(12).frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Theme.redSoft).clipShape(RoundedRectangle(cornerRadius: 12))
+                resultRow("clock", "Space doses at least 6 hours apart")
+                resultRow("fork.knife", "Always take with food")
+                resultRow("stethoscope", "Consult your physician")
+            }
+            .padding(.bottom, 12)
+            ModalActions(primaryLabel: "Got it", secondaryLabel: "Close")
+        }
+    }
+    private func resultRow(_ icon: String, _ text: String) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon).font(.system(size: 14)).foregroundStyle(Theme.brand500)
+            Text(text).font(.system(size: 12.5)).foregroundStyle(Theme.text)
+            Spacer(minLength: 0)
+        }
+    }
+}
+
+struct ExportReportModal: View {
+    @State private var format = "PDF"
+    private let formats = ["PDF", "CSV", "Image"]
+    var body: some View {
+        ModalCard(icon: "arrow.down.circle", title: "Export Report", subtitle: "Choose a format to download") {
+            FlowWrapChips(options: formats, selection: $format).padding(.bottom, 14)
+            ModalActions(primaryLabel: "Export \(format)")
+        }
+    }
+}
+
+struct ShareReportModal: View {
+    private let targets: [(String, String)] = [("envelope", "Email"), ("message", "Message"), ("doc.on.doc", "Copy Link"), ("square.and.arrow.up", "More")]
+    var body: some View {
+        ModalCard(icon: "square.and.arrow.up", title: "Share Report", subtitle: "Send your health report") {
+            HStack(spacing: 10) {
+                ForEach(targets, id: \.1) { t in
+                    VStack(spacing: 6) {
+                        Image(systemName: t.0).font(.system(size: 18)).foregroundStyle(Theme.brand500)
+                            .frame(width: 48, height: 48).background(Theme.brandSoft).clipShape(RoundedRectangle(cornerRadius: 14))
+                        Text(t.1).font(.system(size: 10.5, weight: .medium)).foregroundStyle(Theme.textMuted)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .padding(.bottom, 12)
+            ModalActions(primaryLabel: "Done", secondaryLabel: "Cancel")
+        }
+    }
+}
+
+struct AddCaregiverModal: View {
+    @State private var name = ""
+    @State private var relation = ""
+    var body: some View {
+        ModalCard(icon: "person.badge.plus", title: "Add Person", subtitle: "Connect with a loved one") {
+            ModalField(label: "Name", text: $name)
+            ModalField(label: "Relationship", text: $relation)
+            ModalActions(primaryLabel: "Send Invite")
+        }
+    }
+}
+
+struct LanguageModal: View {
+    @State private var choice = "English"
+    private let langs = ["English", "हिन्दी", "Español", "Français", "العربية", "中文"]
+    var body: some View {
+        ModalCard(icon: "globe", title: "Language", subtitle: "Choose your language") {
+            VStack(spacing: 6) {
+                ForEach(langs, id: \.self) { l in
+                    let on = choice == l
+                    Button { choice = l } label: {
+                        HStack {
+                            Text(l).font(.system(size: 14, weight: .semibold))
+                            Spacer()
+                            if on { Image(systemName: "checkmark").font(.system(size: 14, weight: .bold)) }
+                        }
+                        .foregroundStyle(on ? Theme.brand500 : Theme.text)
+                        .padding(.horizontal, 14).padding(.vertical, 12)
+                        .background(on ? Theme.brandSoft : Theme.surface2).clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+                }
+            }
+            .padding(.bottom, 8)
+            ModalActions(primaryLabel: "Apply")
+        }
+    }
+}
+
+struct UnitsModal: View {
+    @State private var weight = "kg"
+    @State private var temp = "°C"
+    var body: some View {
+        ModalCard(icon: "ruler", title: "Units", subtitle: "Measurement preferences") {
+            unitRow("Weight", ["kg", "lb"], $weight)
+            unitRow("Temperature", ["°C", "°F"], $temp)
+            ModalActions(primaryLabel: "Save")
+        }
+    }
+    private func unitRow(_ label: String, _ options: [String], _ value: Binding<String>) -> some View {
+        HStack {
+            Text(label).font(.system(size: 13.5, weight: .semibold)).foregroundStyle(Theme.text)
+            Spacer()
+            HStack(spacing: 4) {
+                ForEach(options, id: \.self) { o in
+                    let on = value.wrappedValue == o
+                    Button { value.wrappedValue = o } label: {
+                        Text(o).font(.system(size: 12.5, weight: .bold))
+                            .foregroundStyle(on ? .white : Theme.textMuted)
+                            .padding(.horizontal, 14).padding(.vertical, 7)
+                            .background(on ? AnyShapeStyle(Theme.brand500) : AnyShapeStyle(Theme.surface2)).clipShape(Capsule())
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 6).padding(.bottom, 6)
+    }
+}
+
 /// Vertical single-select list (checkmark on the chosen row) used by Snooze / Period.
 private struct ModalChoiceList: View {
     let options: [String]
