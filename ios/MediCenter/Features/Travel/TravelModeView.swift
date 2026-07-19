@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TravelModeView: View {
+    @Environment(AppState.self) private var app
     @State private var on = true
     var body: some View {
         VStack(spacing: 0) {
@@ -58,7 +59,7 @@ struct TravelModeView: View {
                         }
                     }
 
-                    Button {} label: {
+                    Button { app.presentFullScreen(TravelModeWizardView()) } label: {
                         HStack(spacing: 8) { Image(systemName: "airplane"); Text("Configure Travel Mode").font(.system(size: 14, weight: .bold)) }
                             .foregroundStyle(.white).frame(maxWidth: .infinity).padding(.vertical, 14)
                             .background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 18))

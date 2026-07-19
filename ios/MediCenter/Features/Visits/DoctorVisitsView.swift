@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct DoctorVisitsView: View {
+    @Environment(AppState.self) private var app
     struct Appt: Identifiable { let id = UUID(); let mon: String; let day: String; let dow: String; let name: String; let spec: String; let time: String; let confirmed: Bool }
     private let upcoming = [Appt(mon: "MAY", day: "24", dow: "FRI", name: "Dr. Anjali Sharma", spec: "Cardiologist · Apollo Hospital", time: "10:30 AM · 30 min", confirmed: true)]
     private let past = [
@@ -42,6 +43,12 @@ struct DoctorVisitsView: View {
                     HStack(spacing: 10) {
                         tile("clock", "2", "Upcoming", Theme.amberSoft, Theme.amber)
                         tile("stethoscope", "3", "Doctors", Theme.blueSoft, Theme.blue)
+                    }
+
+                    Button { app.presentFullScreen(AddAppointmentWizardView()) } label: {
+                        HStack(spacing: 6) { Image(systemName: "plus"); Text("Book New Appointment").font(.system(size: 13.5, weight: .bold)) }
+                            .foregroundStyle(.white).frame(maxWidth: .infinity).padding(.vertical, 14)
+                            .background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 18))
                     }
                 }
                 .padding(.horizontal, 16).padding(.top, 4).padding(.bottom, 24)
