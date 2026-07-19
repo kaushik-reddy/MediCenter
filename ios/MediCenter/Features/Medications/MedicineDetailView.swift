@@ -153,7 +153,24 @@ struct MedicineDetailView: View {
                             .frame(width: 36, height: 36).background(Theme.brandSoft).clipShape(Circle())
                     }
                 }
+
+                HStack(spacing: 8) {
+                    refillOption("plus.circle", "Add Stock", Theme.brand500, Theme.brandSoft) { app.present(AddStockModal(name: name)) }
+                    refillOption("bell.badge", "Reminder", Theme.amber, Theme.amberSoft) { app.present(SetReminderModal(name: name, med: med)) }
+                    refillOption("cart", "Buy Online", Theme.green, Theme.greenSoft) { app.present(ReorderModal(name: name)) }
+                }
             }
+        }
+    }
+
+    private func refillOption(_ icon: String, _ label: String, _ fg: Color, _ bg: Color, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 5) {
+                Image(systemName: icon).font(.system(size: 16)).foregroundStyle(fg)
+                Text(label).font(.system(size: 10.5, weight: .semibold)).foregroundStyle(fg)
+            }
+            .frame(maxWidth: .infinity).padding(.vertical, 10)
+            .background(bg).clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 
