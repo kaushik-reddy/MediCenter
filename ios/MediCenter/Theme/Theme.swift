@@ -32,6 +32,16 @@ extension Color {
                 : UIColor(Color(hex: light))
         })
     }
+
+    /// Six-digit RGB hex string (no leading #), e.g. "7C5CFC". Used when a color must be
+    /// serialized across the app / widget boundary (Live Activity content state).
+    var hexString: String {
+        let ui = UIColor(self)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        ui.getRed(&r, green: &g, blue: &b, alpha: &a)
+        return String(format: "%02X%02X%02X",
+                      Int((r * 255).rounded()), Int((g * 255).rounded()), Int((b * 255).rounded()))
+    }
 }
 
 // MARK: - MediCenter Design Tokens

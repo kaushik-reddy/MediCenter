@@ -30,8 +30,7 @@ struct RootView: View {
             .navigationBarHidden(true)
             .overlay(alignment: .leading) {
                 DrawerView()
-            }
-            .overlay {
+            }            .overlay {
                 if let modal = app.modal {
                     ZStack {
                         Color.black.opacity(0.45).ignoresSafeArea()
@@ -72,6 +71,7 @@ struct RootView: View {
                 .toolbar(.hidden, for: .navigationBar)
             }
         }
+        .onAppear { NotificationManager.shared.requestAuthorization() }
     }
 }
 

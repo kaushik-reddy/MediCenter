@@ -77,6 +77,11 @@ enum MedicationsData {
         category == .supplement ? supplements : medications
     }
 
+    /// Look up a medication or supplement by display name (used to resolve refill items).
+    static func find(name: String) -> Medication? {
+        (medications + supplements).first { $0.name == name }
+    }
+
     static let refills: [RefillItem] = [
         RefillItem(name: "B-Complex", isLow: true, statusLabel: "Low Stock (3 left)",
                    detail: "1 Tablet · After Dinner", tint: Color(hex: "FDECEF"),

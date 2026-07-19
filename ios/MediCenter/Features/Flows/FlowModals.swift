@@ -27,7 +27,7 @@ struct MarkAsTakenModal: View {
                 }
             }
             .padding(.vertical, 8)
-            Button { app.dismissModal() } label: {
+            Button { app.dismissModal(); LiveActivityManager.shared.end() } label: {
                 Text("Done").font(.system(size: 14, weight: .bold)).foregroundStyle(.white)
                     .frame(maxWidth: .infinity).padding(.vertical, 12)
                     .background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 12))
@@ -61,11 +61,12 @@ struct AddMedicationModal: View {
 
 struct SetReminderModal: View {
     var name: String = ""
+    var med: Medication? = nil
     @State private var days = [true, true, true, true, true, false, false]
     private let labels = ["M", "T", "W", "T", "F", "S", "S"]
     var body: some View {
         ModalCard(icon: "alarm", title: "Set Reminder Time", subtitle: name.isEmpty ? "Choose when to be reminded" : name) {
-            Text("08:30 AM").font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.brand500)
+            Text(med?.time ?? "08:30 AM").font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.brand500)
                 .frame(maxWidth: .infinity).padding(.vertical, 8)
             Text("Repeat").font(.system(size: 12.5, weight: .semibold)).foregroundStyle(Theme.textMuted)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,7 +82,20 @@ struct SetReminderModal: View {
                 }
             }
             .padding(.vertical, 8)
-            ModalActions(primaryLabel: "Save Reminder")
+            ModalActions(primaryLabel: "Save Reminder") {
+                scheduleReminder()
+            }
+        }
+    }
+
+    /// Schedules the lock-screen reminder chain and starts the Dynamic Island countdown.
+    private func scheduleReminder() {
+        let target = med ?? MedicationsData.find(name: name)
+        guard let target else { return }
+        NotificationManager.shared.scheduleDoseReminders(for: target, leadMinutes: 60)
+        NotificationManager.shared.fireDoseDue(for: target, after: 5) // visible test alert
+        if let next = NotificationManager.nextDoseDate(for: target) {
+            LiveActivityManager.shared.startCountdown(med: target, at: next)
         }
     }
 }
@@ -104,11 +118,12 @@ struct DeleteModal: View {
 struct MedicationOptionsModal: View {
     @Environment(AppState.self) private var app
     let name: String
+    var med: Medication? = nil
     var body: some View {
         ModalCard(icon: "pills", title: name, subtitle: "Choose an action") {
             VStack(spacing: 8) {
                 optionButton("checkmark", "Mark as Taken", Theme.greenSoft, Theme.green) { app.present(MarkAsTakenModal(name: name)) }
-                optionButton("bell.badge", "Set Reminder", Theme.brandSoft, Theme.brand500) { app.present(SetReminderModal(name: name)) }
+                optionButton("bell.badge", "Set Reminder", Theme.brandSoft, Theme.brand500) { app.present(SetReminderModal(name: name, med: med)) }
                 optionButton("pencil", "Edit Medication", Theme.surface2, Theme.text) { app.present(AddMedicationModal()) }
                 optionButton("trash", "Delete", Theme.redSoft, Theme.red) { app.present(DeleteModal(name: name)) }
             }

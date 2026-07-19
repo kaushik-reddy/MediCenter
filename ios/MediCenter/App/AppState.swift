@@ -3,8 +3,8 @@ import SwiftUI
 /// Global, observable app state. For now everything is local (in-memory / on-device).
 @Observable
 final class AppState {
-    // Theme preference: nil follows the system.
-    var themeOverride: ColorScheme? = nil
+    // Theme preference: defaults to light mode (users can switch to dark from the drawer/settings).
+    var themeOverride: ColorScheme? = .light
 
     // Shell state
     var selectedTab: AppTab = .home
