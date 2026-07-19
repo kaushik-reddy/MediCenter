@@ -6,71 +6,78 @@ struct RootView: View {
     var body: some View {
         @Bindable var app = app
 
-        NavigationStack(path: $app.navigationPath) {
-            ZStack(alignment: .bottom) {
-                Theme.bg.ignoresSafeArea()
+        ZStack {
+            NavigationStack(path: $app.navigationPath) {
+                ZStack(alignment: .bottom) {
+                    Theme.bg.ignoresSafeArea()
 
-                // Active tab content
-                Group {
-                    switch app.selectedTab {
-                    case .home: HomeView()
-                    case .medications: MedicationsView()
-                    case .calendar: CalendarView()
-                    case .history: HistoryView()
+                    // Active tab content (fades/rises in on each tab switch)
+                    Group {
+                        switch app.selectedTab {
+                        case .home: HomeView()
+                        case .medications: MedicationsView()
+                        case .calendar: CalendarView()
+                        case .history: HistoryView()
+                        }
                     }
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .id(app.selectedTab)
+                    .pageEntrance()
 
-                // Floating bottom nav + center add button
-                CustomTabBar(
-                    selected: $app.selectedTab,
-                    onAdd: { app.presentFullScreen(AddMedicationWizardView()) }
-                )
-            }
-            .navigationBarHidden(true)
-            .overlay(alignment: .leading) {
-                DrawerView()
-            }            .overlay {
-                if let modal = app.modal {
-                    ZStack {
-                        Rectangle().fill(.ultraThinMaterial).ignoresSafeArea()
-                        Color.black.opacity(0.18).ignoresSafeArea()
-                            .onTapGesture { app.dismissModal() }
-                        modal
-                            .padding(.horizontal, 24)
+                    // Floating bottom nav + center add button
+                    CustomTabBar(
+                        selected: $app.selectedTab,
+                        onAdd: { app.presentFullScreen(AddMedicationWizardView()) }
+                    )
+                }
+                .navigationBarHidden(true)
+                .navigationDestination(for: AppRoute.self) { route in
+                    Group {
+                        switch route {
+                        case .profile: ProfileView()
+                        case .reminders: RemindersView()
+                        case .notifications: NotificationsView()
+                        case .inventory: InventoryView()
+                        case .analytics: AnalyticsView()
+                        case .insights: HealthInsightsView()
+                        case .reports: HealthReportsView()
+                        case .visits: DoctorVisitsView()
+                        case .interactions: InteractionCheckerView()
+                        case .caregiver: CaregiverView()
+                        case .contacts: EmergencyContactsView()
+                        case .travel: TravelModeView()
+                        case .settings: SettingsView()
+                        case .medicineDetail(let name): MedicineDetailView(name: name)
+                        }
                     }
-                    .transition(.opacity)
+                    .pageEntrance(rise: 0)
+                    .toolbar(.hidden, for: .navigationBar)
                 }
             }
-            .animation(.easeOut(duration: 0.2), value: app.modal != nil)
-            .fullScreenCover(isPresented: Binding(
-                get: { app.fullScreenFlow != nil },
-                set: { if !$0 { app.fullScreenFlow = nil } }
-            )) {
-                if let flow = app.fullScreenFlow {
-                    flow.environment(app)
+
+            // Drawer sits above the whole navigation stack.
+            DrawerView()
+
+            // Modal popups sit above EVERYTHING (including pushed pages) so they always
+            // appear over the current screen — not just the root tab.
+            if let modal = app.modal {
+                ZStack {
+                    Rectangle().fill(.ultraThinMaterial).ignoresSafeArea()
+                    Color.black.opacity(0.18).ignoresSafeArea()
+                        .onTapGesture { app.dismissModal() }
+                    modal
+                        .padding(.horizontal, 24)
                 }
+                .transition(.opacity)
             }
-            .navigationDestination(for: AppRoute.self) { route in
-                Group {
-                    switch route {
-                    case .profile: ProfileView()
-                    case .reminders: RemindersView()
-                    case .notifications: NotificationsView()
-                    case .inventory: InventoryView()
-                    case .analytics: AnalyticsView()
-                    case .insights: HealthInsightsView()
-                    case .reports: HealthReportsView()
-                    case .visits: DoctorVisitsView()
-                    case .interactions: InteractionCheckerView()
-                    case .caregiver: CaregiverView()
-                    case .contacts: EmergencyContactsView()
-                    case .travel: TravelModeView()
-                    case .settings: SettingsView()
-                    case .medicineDetail(let name): MedicineDetailView(name: name)
-                    }
-                }
-                .toolbar(.hidden, for: .navigationBar)
+        }
+        .animation(.easeOut(duration: 0.2), value: app.modal != nil)
+        .fullScreenCover(isPresented: Binding(
+            get: { app.fullScreenFlow != nil },
+            set: { if !$0 { app.fullScreenFlow = nil } }
+        )) {
+            if let flow = app.fullScreenFlow {
+                flow.environment(app)
             }
         }
         .onAppear { NotificationManager.shared.requestAuthorization() }

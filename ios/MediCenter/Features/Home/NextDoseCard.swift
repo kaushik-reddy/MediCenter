@@ -18,10 +18,12 @@ struct NextDoseCard: View {
                 )
             }
 
-            // Illustration
+            // Illustration — pinned to the top-right of the hero card
             PillGlassIllustration()
-                .frame(width: 156, height: 112)
-                .offset(x: 172, y: 6)
+                .frame(width: 150, height: 108)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                .padding(.top, 10)
+                .padding(.trailing, 12)
                 .allowsHitTesting(false)
 
             VStack(alignment: .leading, spacing: 0) {
