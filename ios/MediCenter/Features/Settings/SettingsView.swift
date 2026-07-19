@@ -21,27 +21,27 @@ struct SettingsView: View {
                     .padding(16).background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 20))
 
                     section("Preferences") {
-                        SettingsRow(icon: "bell", title: "Reminder & Notification", subtitle: "Timing, channels, quiet hours")
-                        SettingsRow(icon: "pills", title: "Medications", subtitle: "Default dose, refill alerts")
-                        SettingsRow(icon: "waveform.path.ecg", title: "Health Insights", subtitle: "Metrics and tracking")
-                        SettingsRow(icon: "phone", title: "Emergency Contacts", subtitle: "Manage contacts", last: true)
+                        SettingsRow(icon: "bell", title: "Reminder & Notification", subtitle: "Timing, channels, quiet hours") { app.present(NotificationChannelsModal()) }
+                        SettingsRow(icon: "pills", title: "Medications", subtitle: "Default dose, refill alerts") { app.present(InfoModal(icon: "pills", title: "Medication Preferences", message: "Choose your units, dosage format and display preferences.")) }
+                        SettingsRow(icon: "waveform.path.ecg", title: "Health Insights", subtitle: "Metrics and tracking") { app.open(.insights) }
+                        SettingsRow(icon: "phone", title: "Emergency Contacts", subtitle: "Manage contacts", last: true) { app.open(.contacts) }
                     }
                     section("App Settings") {
                         SettingsRow(icon: "paintpalette", title: "Appearance", subtitle: "Theme, color and display",
                                     trailing: .pill(icon: "sun.max", label: colorScheme == .dark ? "Dark" : "Light")) {
                             app.themeOverride = (app.themeOverride == .dark || colorScheme == .dark) ? .light : .dark
                         }
-                        SettingsRow(icon: "globe", title: "Language", subtitle: "Choose your language", trailing: .pill(icon: nil, label: "English"))
-                        SettingsRow(icon: "ruler", title: "Units", subtitle: "Weight, height, temperature", last: true)
+                        SettingsRow(icon: "globe", title: "Language", subtitle: "Choose your language", trailing: .pill(icon: nil, label: "English")) { app.present(LanguageModal()) }
+                        SettingsRow(icon: "ruler", title: "Units", subtitle: "Weight, height, temperature", last: true) { app.present(UnitsModal()) }
                     }
                     section("Account & Data") {
-                        SettingsRow(icon: "icloud.and.arrow.up", title: "Backup & Restore", subtitle: "Keep your data safe")
-                        SettingsRow(icon: "checkmark.shield", title: "Privacy & Security", subtitle: "App lock, encryption", last: true)
+                        SettingsRow(icon: "icloud.and.arrow.up", title: "Backup & Restore", subtitle: "Keep your data safe") { app.present(InfoModal(icon: "icloud.and.arrow.up", title: "Backup & Restore", message: "Back up your data locally or restore from a previous backup.")) }
+                        SettingsRow(icon: "checkmark.shield", title: "Privacy & Security", subtitle: "App lock, encryption", last: true) { app.present(InfoModal(icon: "checkmark.shield", title: "Privacy & Security", message: "Enable app lock and encryption to protect your health data.")) }
                     }
                     section("Support") {
-                        SettingsRow(icon: "questionmark.circle", title: "Help & FAQs", subtitle: "Find answers")
-                        SettingsRow(icon: "headphones", title: "Contact Support", subtitle: "We're here to help")
-                        SettingsRow(icon: "info.circle", title: "About MediCenter", subtitle: "Version 1.2.0", last: true)
+                        SettingsRow(icon: "questionmark.circle", title: "Help & FAQs", subtitle: "Find answers") { app.present(InfoModal(icon: "questionmark.circle", title: "Help & FAQs", message: "Find answers to common questions and learn how to use MediCenter.")) }
+                        SettingsRow(icon: "headphones", title: "Contact Support", subtitle: "We're here to help") { app.present(InfoModal(icon: "headphones", title: "Contact Support", message: "Reach our support team at support@medicenter.app anytime.")) }
+                        SettingsRow(icon: "info.circle", title: "About MediCenter", subtitle: "Version 1.2.0", last: true) { app.present(InfoModal(icon: "info.circle", title: "About MediCenter", message: "MediCenter v1.2.0 — your personal medication companion.")) }
                     }
                 }
                 .padding(.horizontal, 16).padding(.top, 4).padding(.bottom, 24)

@@ -569,6 +569,68 @@ struct UnitsModal: View {
     }
 }
 
+// MARK: - Inventory: Add Stock / Scan pack
+
+struct AddStockModal: View {
+    var name: String = ""
+    @State private var qty = 30
+    @State private var purchaseDate = ""
+    @State private var note = ""
+    var body: some View {
+        ModalCard(icon: "plus.circle", title: "Add Stock", subtitle: name.isEmpty ? "Update your inventory" : name) {
+            HStack {
+                Text("Quantity").font(.system(size: 13.5, weight: .semibold)).foregroundStyle(Theme.text)
+                Spacer()
+                Button { qty = max(1, qty - 1) } label: { Image(systemName: "minus").foregroundStyle(Theme.brand500).frame(width: 32, height: 32).background(Theme.surface).clipShape(Circle()) }
+                Text("\(qty)").font(.system(size: 16, weight: .bold)).foregroundStyle(Theme.text).frame(width: 40)
+                Button { qty += 1 } label: { Image(systemName: "plus").foregroundStyle(.white).frame(width: 32, height: 32).background(Theme.brand500).clipShape(Circle()) }
+            }
+            .padding(12).background(Theme.surface2).clipShape(RoundedRectangle(cornerRadius: 12)).padding(.bottom, 10)
+            ModalField(label: "Purchase Date", text: $purchaseDate)
+            ModalField(label: "Note (Optional)", text: $note)
+            ModalActions(primaryLabel: "Add to Inventory")
+        }
+    }
+}
+
+struct ScanMedicineModal: View {
+    @State private var scanned = false
+    var body: some View {
+        ModalCard(icon: "camera.viewfinder", title: "Scan Medicine Pack", subtitle: scanned ? "We found a match" : "Point your camera at the pack") {
+            ZStack {
+                RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Theme.surface2)
+                    .frame(height: 150)
+                RoundedRectangle(cornerRadius: 12).strokeBorder(Theme.brand500, style: StrokeStyle(lineWidth: 2, dash: [8]))
+                    .frame(width: 170, height: 110)
+                Image(systemName: scanned ? "checkmark.circle.fill" : "viewfinder")
+                    .font(.system(size: 40)).foregroundStyle(scanned ? Theme.green : Theme.brand500)
+            }
+            .padding(.bottom, 10)
+
+            if scanned {
+                HStack(spacing: 12) {
+                    Image(systemName: "pills").font(.system(size: 20)).foregroundStyle(Theme.brand500)
+                        .frame(width: 44, height: 44).background(Theme.brandSoft).clipShape(RoundedRectangle(cornerRadius: 12))
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Paracetamol 650mg").font(.system(size: 14, weight: .bold)).foregroundStyle(Theme.text)
+                        Text("Tablet · 20 in pack · Exp 08/2027").font(.system(size: 11.5)).foregroundStyle(Theme.textMuted)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(12).background(Theme.surface2).clipShape(RoundedRectangle(cornerRadius: 12)).padding(.bottom, 10)
+                ModalActions(primaryLabel: "Add to Inventory")
+            } else {
+                Button { withAnimation { scanned = true } } label: {
+                    HStack(spacing: 8) { Image(systemName: "camera"); Text("Scan Now").font(.system(size: 14, weight: .bold)) }
+                        .foregroundStyle(.white).frame(maxWidth: .infinity).padding(.vertical, 12)
+                        .background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(.top, 2)
+            }
+        }
+    }
+}
+
 /// Vertical single-select list (checkmark on the chosen row) used by Snooze / Period.
 private struct ModalChoiceList: View {
     let options: [String]

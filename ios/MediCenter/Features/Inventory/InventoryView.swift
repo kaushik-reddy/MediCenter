@@ -18,6 +18,11 @@ struct InventoryView: View {
                 VStack(spacing: 12) {
                     InfoBanner(icon: "shippingbox", title: "Never run out", subtitle: "Track stock and set refill reminders")
                     ChipsRow(items: [ChipItem(label: "All", count: 8), ChipItem(label: "Low Stock", count: 3), ChipItem(label: "Refill Due", count: 2), ChipItem(label: "Out of Stock", count: 1)], active: $chip)
+                    Button { app.present(ScanMedicineModal()) } label: {
+                        HStack(spacing: 8) { Image(systemName: "camera.viewfinder"); Text("Scan Medicine Pack").font(.system(size: 13.5, weight: .bold)) }
+                            .foregroundStyle(Theme.brand500).frame(maxWidth: .infinity).padding(.vertical, 13)
+                            .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [5])).foregroundStyle(Theme.brand500.opacity(0.5)))
+                    }
                     ForEach(items) { it in card(it) }
                 }
                 .padding(.horizontal, 16).padding(.top, 4).padding(.bottom, 24)
@@ -56,6 +61,11 @@ struct InventoryView: View {
                 HStack {
                     Text(it.refill).font(.system(size: 12, weight: .semibold)).foregroundStyle(it.badge)
                     Spacer()
+                    Button { app.present(AddStockModal(name: it.name)) } label: {
+                        HStack(spacing: 6) { Image(systemName: "plus").font(.system(size: 12)); Text("Add Stock").font(.system(size: 12, weight: .bold)) }
+                            .foregroundStyle(Theme.brand500).padding(.horizontal, 12).padding(.vertical, 6)
+                            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.brand500.opacity(0.4), lineWidth: 1))
+                    }
                     Button { app.present(ReorderModal(name: it.name)) } label: {
                         HStack(spacing: 6) { Image(systemName: "cart").font(.system(size: 12)); Text("Reorder").font(.system(size: 12, weight: .bold)) }
                             .foregroundStyle(.white).padding(.horizontal, 12).padding(.vertical, 6)
