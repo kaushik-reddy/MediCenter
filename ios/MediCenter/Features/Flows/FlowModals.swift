@@ -162,54 +162,279 @@ struct ReorderModal: View {
 }
 
 struct FilterModal: View {
-    @State private var food: String? = nil
-    @State private var timeOfDay: String? = nil
-    @State private var sched: String? = nil
-    private let foods = ["Before Food", "After Food", "Before Bed"]
-    private let times = ["Morning", "Afternoon", "Evening", "Night"]
-    private let scheds = ["Everyday", "Weekdays", "Custom"]
+    @State private var active = "All"
+    private let chips = ["All", "Tablet", "Capsule", "Syrup", "Before Food", "After Food", "Morning", "Night"]
 
     var body: some View {
-        ModalCard(icon: "slider.horizontal.3", title: "Filter", subtitle: "Narrow down your list") {
-            filterGroup("Food", options: foods, selection: $food)
-            filterGroup("Time of Day", options: times, selection: $timeOfDay)
-            filterGroup("Schedule", options: scheds, selection: $sched)
-            ModalActions(primaryLabel: "Apply Filters") {
-                food = nil; timeOfDay = nil; sched = nil
-            }
+        ModalCard(icon: "slider.horizontal.3", title: "Filter", subtitle: "Refine your medicine list") {
+            FlowWrapChips(options: chips, selection: $active)
+                .padding(.bottom, 16)
+            ModalActions(primaryLabel: "Apply Filters", secondaryLabel: "Reset")
         }
-    }
-
-    private func filterGroup(_ label: String, options: [String], selection: Binding<String?>) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label).font(.system(size: 12.5, weight: .semibold)).foregroundStyle(Theme.textMuted)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            FlowChips(options: options, selection: selection)
-        }
-        .padding(.bottom, 14)
     }
 }
 
-private struct FlowChips: View {
+/// Single-select wrapping chip row used across the filter/period popups.
+struct FlowWrapChips: View {
     let options: [String]
-    @Binding var selection: String?
+    @Binding var selection: String
 
     var body: some View {
-        HStack(spacing: 8) {
+        FlowLayout(spacing: 8, lineSpacing: 8) {
             ForEach(options, id: \.self) { opt in
-                let active = selection == opt
-                Button {
-                    selection = active ? nil : opt
-                } label: {
+                let on = selection == opt
+                Button { selection = opt } label: {
                     Text(opt)
                         .font(.system(size: 12.5, weight: .semibold))
-                        .foregroundStyle(active ? Color.white : Theme.textMuted)
-                        .padding(.horizontal, 12).padding(.vertical, 8)
-                        .background(active ? AnyShapeStyle(Theme.brand500) : AnyShapeStyle(Theme.surface2))
+                        .foregroundStyle(on ? Color.white : Theme.textMuted)
+                        .padding(.horizontal, 14).padding(.vertical, 8)
+                        .background(on ? AnyShapeStyle(Theme.brand500) : AnyShapeStyle(Theme.surface2))
                         .clipShape(Capsule())
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Skip / Snooze / Reschedule / Dose actions
+
+struct ConfirmSkipModal: View {
+    var body: some View {
+        ModalCard(icon: "exclamationmark.triangle.fill", iconBg: Theme.amberSoft, iconFg: Theme.amber,
+                  title: "Are you sure?", subtitle: "Do you want to skip this dose?") {
+            Text("Skipping doses may affect your treatment. This will be recorded in your history.")
+                .font(.system(size: 12.5)).foregroundStyle(Theme.amber)
+                .padding(12).frame(maxWidth: .infinity, alignment: .leading)
+                .background(Theme.amberSoft).clipShape(RoundedRectangle(cornerRadius: 12)).padding(.bottom, 12)
+            ModalActions(primaryLabel: "Skip Dose", secondaryLabel: "Go Back", primaryColor: AnyShapeStyle(Theme.amber))
+        }
+    }
+}
+
+struct SnoozeModal: View {
+    var name: String = ""
+    @State private var choice = "15 minutes"
+    private let opts = ["5 minutes", "15 minutes", "30 minutes", "1 hour", "Custom"]
+    var body: some View {
+        ModalCard(icon: "moon.fill", title: "Snooze Reminder",
+                  subtitle: name.isEmpty ? "Remind me again in" : "Remind me about \(name) in") {
+            ModalChoiceList(options: opts, choice: $choice)
+            ModalActions(primaryLabel: "Snooze")
+        }
+    }
+}
+
+struct RescheduleDoseModal: View {
+    var name: String = ""
+    var current: String = ""
+    @State private var hh = "09"
+    @State private var mm = "00"
+    @State private var ap = "AM"
+    private let hours = (1...12).map { String(format: "%02d", $0) }
+    private let mins = stride(from: 0, through: 55, by: 5).map { String(format: "%02d", $0) }
+
+    var body: some View {
+        ModalCard(icon: "calendar.badge.clock", title: "Reschedule Dose",
+                  subtitle: name.isEmpty ? "Pick a new time for today" : name) {
+            HStack(spacing: 8) {
+                TimeBox(value: $hh, options: hours)
+                Text(":").font(.system(size: 24, weight: .bold)).foregroundStyle(Theme.text)
+                TimeBox(value: $mm, options: mins)
+                TimeBox(value: $ap, options: ["AM", "PM"])
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, 16)
+            .onAppear { applyCurrent() }
+            ModalActions(primaryLabel: "Reschedule")
+        }
+    }
+
+    private func applyCurrent() {
+        // Parse "09:30 PM"
+        let parts = current.uppercased().split(whereSeparator: { $0 == ":" || $0 == " " })
+        if parts.count >= 3 {
+            hh = String(parts[0]).count == 1 ? "0" + parts[0] : String(parts[0])
+            mm = String(parts[1])
+            ap = String(parts[2])
+        }
+    }
+}
+
+private struct TimeBox: View {
+    @Binding var value: String
+    let options: [String]
+    var body: some View {
+        Menu {
+            ForEach(options, id: \.self) { o in
+                Button(o) { value = o }
+            }
+        } label: {
+            Text(value)
+                .font(.system(size: 22, weight: .bold)).foregroundStyle(Theme.text)
+                .frame(width: 64, height: 56)
+                .background(Theme.surface2)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+    }
+}
+
+struct DoseActionsModal: View {
+    @Environment(AppState.self) private var app
+    let name: String
+    var time: String = ""
+    var med: Medication? = nil
+    var body: some View {
+        ModalCard(icon: "pills", title: name, subtitle: time.isEmpty ? "Choose an action" : "Scheduled for \(time)") {
+            VStack(spacing: 8) {
+                optionRow("checkmark", "Mark as Taken", Theme.greenSoft, Theme.green) { app.present(MarkAsTakenModal(name: name)) }
+                optionRow("moon.fill", "Snooze", Theme.brandSoft, Theme.brand500) { app.present(SnoozeModal(name: name)) }
+                optionRow("calendar.badge.clock", "Reschedule", Theme.amberSoft, Theme.amber) { app.present(RescheduleDoseModal(name: name, current: time)) }
+                optionRow("forward.end.fill", "Skip Dose", Theme.amberSoft, Color(hex: "F97316")) { app.present(ConfirmSkipModal()) }
+            }
+        }
+    }
+    private func optionRow(_ icon: String, _ title: String, _ bg: Color, _ fg: Color, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon).font(.system(size: 17))
+                Text(title).font(.system(size: 14, weight: .semibold))
+                Spacer()
+            }
+            .foregroundStyle(fg).padding(.horizontal, 14).padding(.vertical, 12)
+            .background(bg).clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+}
+
+// MARK: - Reminders / notifications
+
+struct NotificationChannelsModal: View {
+    @State private var ch: [String: Bool] = ["Push": true, "Email": true, "WhatsApp": true, "SMS": false, "Phone Call": false]
+    private let order = ["Push", "Email", "WhatsApp", "SMS", "Phone Call"]
+    var body: some View {
+        ModalCard(icon: "bell.badge", title: "Notification Channels", subtitle: "How should we reach you?") {
+            VStack(spacing: 8) {
+                ForEach(order, id: \.self) { k in
+                    HStack {
+                        Text(k).font(.system(size: 14, weight: .semibold)).foregroundStyle(Theme.text)
+                        Spacer()
+                        Toggle("", isOn: Binding(get: { ch[k] ?? false }, set: { ch[k] = $0 })).labelsHidden().tint(Theme.brand500)
+                    }
+                    .padding(12).background(Theme.surface2).clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+            Text("You'll always receive critical alerts even if channels are turned off.")
+                .font(.system(size: 11.5)).foregroundStyle(Theme.brand500)
+                .padding(.horizontal, 12).padding(.vertical, 10).frame(maxWidth: .infinity, alignment: .leading)
+                .background(Theme.brandSoft).clipShape(RoundedRectangle(cornerRadius: 12))
+                .padding(.vertical, 12)
+            ModalActions(primaryLabel: "Save Preferences")
+        }
+    }
+}
+
+struct ReminderOptionsModal: View {
+    @Environment(AppState.self) private var app
+    let name: String
+    var body: some View {
+        ModalCard(icon: "alarm", title: name, subtitle: "Reminder options") {
+            VStack(spacing: 8) {
+                optionRow("clock", "Edit Time", Theme.brandSoft, Theme.brand500) { app.present(SetReminderModal(name: name)) }
+                optionRow("moon.fill", "Snooze", Theme.surface2, Theme.text) { app.present(SnoozeModal()) }
+                optionRow("bell.badge", "Notification Channels", Theme.surface2, Theme.text) { app.present(NotificationChannelsModal()) }
+                optionRow("trash", "Delete Reminder", Theme.redSoft, Theme.red) { app.present(DeleteModal(name: name)) }
+            }
+        }
+    }
+    private func optionRow(_ icon: String, _ title: String, _ bg: Color, _ fg: Color, _ action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon).font(.system(size: 17))
+                Text(title).font(.system(size: 14, weight: .semibold))
+                Spacer()
+            }
+            .foregroundStyle(fg).padding(.horizontal, 14).padding(.vertical, 12)
+            .background(bg).clipShape(RoundedRectangle(cornerRadius: 12))
+        }
+    }
+}
+
+// MARK: - Generic info / period / date-range / logout
+
+struct InfoModal: View {
+    @Environment(AppState.self) private var app
+    var icon: String = "bell.badge"
+    let title: String
+    let message: String
+    var body: some View {
+        ModalCard(icon: icon, title: title, subtitle: message) {
+            Button { app.dismissModal() } label: {
+                Text("Got it").font(.system(size: 14, weight: .bold)).foregroundStyle(.white)
+                    .frame(maxWidth: .infinity).padding(.vertical, 12)
+                    .background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .padding(.top, 2)
+        }
+    }
+}
+
+struct PeriodModal: View {
+    var onSelect: ((String) -> Void)? = nil
+    @State private var choice = "This Week"
+    private let opts = ["Today", "This Week", "This Month", "Last 3 Months", "This Year"]
+    var body: some View {
+        ModalCard(icon: "clock", title: "Select Period", subtitle: "Choose a time range") {
+            ModalChoiceList(options: opts, choice: $choice)
+            ModalActions(primaryLabel: "Apply") { onSelect?(choice) }
+        }
+    }
+}
+
+struct DateRangeModal: View {
+    @State private var from = ""
+    @State private var to = ""
+    var body: some View {
+        ModalCard(icon: "clock", title: "Select Date Range", subtitle: "Filter by custom dates") {
+            HStack(spacing: 12) {
+                ModalField(label: "From", text: $from)
+                ModalField(label: "To", text: $to)
+            }
+            ModalActions(primaryLabel: "Apply Range")
+        }
+    }
+}
+
+struct LogoutModal: View {
+    var body: some View {
+        ModalCard(icon: "rectangle.portrait.and.arrow.right", iconBg: Theme.redSoft, iconFg: Theme.red,
+                  title: "Log Out", subtitle: "Are you sure you want to log out?") {
+            ModalActions(primaryLabel: "Log Out", primaryColor: AnyShapeStyle(Theme.red))
+        }
+    }
+}
+
+/// Vertical single-select list (checkmark on the chosen row) used by Snooze / Period.
+private struct ModalChoiceList: View {
+    let options: [String]
+    @Binding var choice: String
+    var body: some View {
+        VStack(spacing: 6) {
+            ForEach(options, id: \.self) { o in
+                let on = choice == o
+                Button { choice = o } label: {
+                    HStack {
+                        Text(o).font(.system(size: 14, weight: .semibold))
+                        Spacer()
+                        if on { Image(systemName: "checkmark").font(.system(size: 14, weight: .bold)) }
+                    }
+                    .foregroundStyle(on ? Theme.brand500 : Theme.text)
+                    .padding(.horizontal, 14).padding(.vertical, 12)
+                    .background(on ? Theme.brandSoft : Theme.surface2)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+        }
+        .padding(.bottom, 8)
     }
 }

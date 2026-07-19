@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TodayScheduleCard: View {
+    @Environment(AppState.self) private var app
     let items: [ScheduleItem]
     var onViewAll: () -> Void = {}
 
@@ -25,7 +26,10 @@ struct TodayScheduleCard: View {
 
                     VStack(spacing: 10) {
                         ForEach(items) { item in
-                            ScheduleRow(item: item)
+                            Button { app.present(DoseActionsModal(name: item.name, time: item.time)) } label: {
+                                ScheduleRow(item: item)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }

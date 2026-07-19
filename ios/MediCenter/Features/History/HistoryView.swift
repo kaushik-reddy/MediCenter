@@ -23,15 +23,18 @@ struct HistoryView: View {
 }
 
 private struct SummaryCard: View {
+    @Environment(AppState.self) private var app
     let s = HistoryData.summary
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 4) {
-                    Text(s.period).font(.system(size: 13, weight: .semibold))
-                    Image(systemName: "chevron.down").font(.system(size: 11, weight: .semibold))
+                Button { app.present(PeriodModal()) } label: {
+                    HStack(spacing: 4) {
+                        Text(s.period).font(.system(size: 13, weight: .semibold))
+                        Image(systemName: "chevron.down").font(.system(size: 11, weight: .semibold))
+                    }
+                    .foregroundStyle(Theme.brand500)
                 }
-                .foregroundStyle(Theme.brand500)
                 Text("\(s.percent)%").font(.system(size: 34, weight: .heavy)).foregroundStyle(Theme.brand500).padding(.top, 2)
                 Text("Taken on time").font(.system(size: 13, weight: .medium)).foregroundStyle(Theme.text)
                 ProgressBar(percent: s.percent).frame(height: 8).padding(.top, 8)
@@ -73,6 +76,7 @@ private struct ProgressBar: View {
 }
 
 private struct SearchRow: View {
+    @Environment(AppState.self) private var app
     var body: some View {
         HStack(spacing: 10) {
             HStack(spacing: 8) {
@@ -84,8 +88,8 @@ private struct SearchRow: View {
             .background(Theme.surface).clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Theme.border, lineWidth: 1))
 
-            chip("calendar", "Date Range", Theme.border)
-            chip("slider.horizontal.3", "Filter", Theme.brand500.opacity(0.4))
+            Button { app.present(DateRangeModal()) } label: { chip("calendar", "Date Range", Theme.border) }
+            Button { app.present(FilterModal()) } label: { chip("slider.horizontal.3", "Filter", Theme.brand500.opacity(0.4)) }
         }
     }
     private func chip(_ icon: String, _ label: String, _ border: Color) -> some View {

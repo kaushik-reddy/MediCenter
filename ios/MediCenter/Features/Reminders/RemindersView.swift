@@ -65,7 +65,10 @@ struct RemindersView: View {
                 Image(systemName: "bell").font(.system(size: 16)).foregroundStyle(Theme.brand500)
                     .frame(width: 36, height: 36).background(Theme.brandSoft).clipShape(Circle())
             }
-            Image(systemName: "ellipsis").font(.system(size: 16)).foregroundStyle(Theme.textFaint)
+            Button { app.present(ReminderOptionsModal(name: r.name)) } label: {
+                Image(systemName: "ellipsis").font(.system(size: 16)).foregroundStyle(Theme.textFaint)
+                    .frame(width: 32, height: 36)
+            }
         }
         .padding(10).background(Theme.surface).clipShape(RoundedRectangle(cornerRadius: 18))
         .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(Theme.border, lineWidth: 1))

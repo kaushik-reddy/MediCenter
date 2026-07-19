@@ -33,7 +33,7 @@ struct ProfileView: View {
                         SettingsRow(icon: "info.circle", title: "About App", subtitle: "Version 1.2.0", last: true)
                     }
 
-                    Button {} label: {
+                    Button { app.present(LogoutModal()) } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "rectangle.portrait.and.arrow.right")
                             Text("Log Out").font(.system(size: 15, weight: .bold))
