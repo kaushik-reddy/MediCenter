@@ -219,7 +219,7 @@ struct MedicineDetailView: View {
                     .foregroundStyle(Theme.red).frame(maxWidth: .infinity).padding(.vertical, 12)
                     .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Theme.red.opacity(0.5), lineWidth: 1))
             }
-            Button {} label: {
+            Button { app.present(InfoModal(icon: "pause.circle", title: "Pause Medicine", message: "Pausing \(med.name) stops its reminders until you resume it.")) } label: {
                 HStack(spacing: 6) { Image(systemName: "pause"); Text("Pause Medicine").font(.system(size: 14, weight: .bold)) }
                     .foregroundStyle(.white).frame(maxWidth: .infinity).padding(.vertical, 12)
                     .background(Theme.brandGradient).clipShape(RoundedRectangle(cornerRadius: 16))

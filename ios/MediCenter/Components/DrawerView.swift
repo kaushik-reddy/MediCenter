@@ -142,7 +142,7 @@ struct DrawerView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 11)
             }
-            Button {} label: {
+            Button { close(); app.present(LogoutModal()) } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                         .frame(width: 22)
