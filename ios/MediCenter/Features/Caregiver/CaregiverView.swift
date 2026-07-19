@@ -4,11 +4,7 @@ struct CaregiverView: View {
     @Environment(AppState.self) private var app
     @State private var chip = "All"
     struct Person: Identifiable { let id = UUID(); let name: String; let attention: Bool; let meds: Int; let updated: String; let missed: Int; let late: Int; let taken: Int }
-    private let people = [
-        Person(name: "Mom", attention: true, meds: 5, updated: "10 min ago", missed: 1, late: 1, taken: 3),
-        Person(name: "Dad", attention: true, meds: 4, updated: "25 min ago", missed: 0, late: 2, taken: 2),
-        Person(name: "Grandma", attention: false, meds: 6, updated: "5 min ago", missed: 0, late: 0, taken: 6),
-    ]
+    private let people: [Person] = []
 
     var body: some View {
         VStack(spacing: 0) {
@@ -17,6 +13,10 @@ struct CaregiverView: View {
                 VStack(spacing: 12) {
                     InfoBanner(icon: "person.2", title: "Connected with 3 people", subtitle: "You're helping them stay on track")
                     ChipsRow(items: [ChipItem(label: "All", count: 3), ChipItem(label: "Needs Attention", count: 2), ChipItem(label: "All Good", count: 1)], active: $chip)
+                    if people.isEmpty {
+                        EmptyState(icon: "person.2", title: "No one connected yet",
+                                   message: "Add a loved one to keep an eye on their medications.")
+                    }
                     ForEach(people) { p in card(p) }
                     InfoBanner(icon: "checkmark.shield", title: "Care with confidence", subtitle: "Their data is private and secure.")
                 }

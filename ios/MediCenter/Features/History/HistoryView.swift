@@ -8,6 +8,10 @@ struct HistoryView: View {
                 VStack(spacing: 12) {
                     SummaryCard()
                     SearchRow()
+                    if HistoryData.groups.isEmpty {
+                        EmptyState(icon: "clock.arrow.circlepath", title: "No history yet",
+                                   message: "Your dose history will appear here as you take your medicines.")
+                    }
                     ForEach(HistoryData.groups) { group in
                         GroupCard(group: group)
                     }

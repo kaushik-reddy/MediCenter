@@ -4,27 +4,29 @@ struct EmergencyContactsView: View {
     @Environment(AppState.self) private var app
     @State private var chip = "All"
     struct Contact: Identifiable { let id = UUID(); let name: String; let rel: String; let phone: String; let primary: Bool; var order: Int? = nil }
-    private let primaryC = [
-        Contact(name: "Anita Reddy", rel: "Mother", phone: "+91 98765 43210", primary: true, order: 1),
-        Contact(name: "Dr. Sharma", rel: "Family Doctor", phone: "+91 98765 11111", primary: true, order: 2),
-        Contact(name: "Ravi Reddy", rel: "Brother", phone: "+91 98765 22222", primary: true, order: 3),
-    ]
-    private let secondaryC = [
-        Contact(name: "Priya Sharma", rel: "Friend", phone: "+91 98765 33333", primary: false),
-        Contact(name: "Apollo Hospital", rel: "Emergency", phone: "1066", primary: false),
-    ]
+    private let primaryC: [Contact] = []
+    private let secondaryC: [Contact] = []
 
     var body: some View {
         VStack(spacing: 0) {
             TopBar(title: "Emergency Contacts", subtitle: "Your safety, our priority")
             ScrollView {
                 VStack(spacing: 12) {
-                    InfoBanner(icon: "checkmark.shield", title: "You're protected", subtitle: "5 emergency contacts are ready to help")
-                    ChipsRow(items: [ChipItem(label: "All", count: 5), ChipItem(label: "Family", count: 3), ChipItem(label: "Friends", count: 2), ChipItem(label: "Others", count: 0)], active: $chip)
-                    Text("Primary Contacts").font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.text).frame(maxWidth: .infinity, alignment: .leading)
-                    ForEach(primaryC) { c in row(c) }
-                    Text("Secondary Contacts").font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.text).frame(maxWidth: .infinity, alignment: .leading)
-                    ForEach(secondaryC) { c in row(c) }
+                    InfoBanner(icon: "checkmark.shield", title: "Stay prepared", subtitle: "No emergency contacts yet")
+                    ChipsRow(items: [ChipItem(label: "All", count: 0), ChipItem(label: "Family", count: 0), ChipItem(label: "Friends", count: 0), ChipItem(label: "Others", count: 0)], active: $chip)
+                    if primaryC.isEmpty && secondaryC.isEmpty {
+                        EmptyState(icon: "phone", title: "No contacts yet",
+                                   message: "Add emergency contacts so they can be reached quickly.")
+                    } else {
+                        if !primaryC.isEmpty {
+                            Text("Primary Contacts").font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.text).frame(maxWidth: .infinity, alignment: .leading)
+                            ForEach(primaryC) { c in row(c) }
+                        }
+                        if !secondaryC.isEmpty {
+                            Text("Secondary Contacts").font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.text).frame(maxWidth: .infinity, alignment: .leading)
+                            ForEach(secondaryC) { c in row(c) }
+                        }
+                    }
                     Button { app.presentFullScreen(AddContactWizardView()) } label: {
                         HStack(spacing: 6) { Image(systemName: "plus"); Text("Add Emergency Contact").font(.system(size: 13.5, weight: .bold)) }
                             .foregroundStyle(Theme.brand500).frame(maxWidth: .infinity).padding(.vertical, 14)

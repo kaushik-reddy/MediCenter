@@ -3,46 +3,52 @@ import SwiftUI
 struct DoctorVisitsView: View {
     @Environment(AppState.self) private var app
     struct Appt: Identifiable { let id = UUID(); let mon: String; let day: String; let dow: String; let name: String; let spec: String; let time: String; let confirmed: Bool }
-    private let upcoming = [Appt(mon: "MAY", day: "24", dow: "FRI", name: "Dr. Anjali Sharma", spec: "Cardiologist · Apollo Hospital", time: "10:30 AM · 30 min", confirmed: true)]
-    private let past = [
-        Appt(mon: "MAY", day: "10", dow: "FRI", name: "Dr. Rajesh Kumar", spec: "General Physician · Fortis", time: "4:00 PM · 20 min", confirmed: false),
-        Appt(mon: "APR", day: "28", dow: "SUN", name: "Dr. Meera Iyer", spec: "Dermatologist · Max Clinic", time: "11:00 AM · 30 min", confirmed: false),
-    ]
+    private let upcoming: [Appt] = []
+    private let past: [Appt] = []
 
     var body: some View {
         VStack(spacing: 0) {
             TopBar(title: "Doctor Visits", subtitle: "Manage your appointments")
             ScrollView {
                 VStack(spacing: 12) {
-                    header("Upcoming Appointments", "View Calendar")
-                    ForEach(upcoming) { a in
-                        VStack(spacing: 12) {
-                            apptRow(a)
-                            HStack(spacing: 8) {
-                                Image(systemName: "bell").font(.system(size: 15)).foregroundStyle(Theme.brand500)
-                                Text("Appointment in 2 days").font(.system(size: 12, weight: .medium)).foregroundStyle(Theme.brand500)
-                                Spacer()
-                                Text("View Details").font(.system(size: 12, weight: .semibold)).foregroundStyle(Theme.brand500)
+                    if upcoming.isEmpty && past.isEmpty {
+                        EmptyState(icon: "stethoscope", title: "No appointments yet",
+                                   message: "Book a doctor visit to keep track of it here.")
+                    } else {
+                        if !upcoming.isEmpty {
+                            header("Upcoming Appointments", "View Calendar")
+                            ForEach(upcoming) { a in
+                                VStack(spacing: 12) {
+                                    apptRow(a)
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "bell").font(.system(size: 15)).foregroundStyle(Theme.brand500)
+                                        Text("Appointment in 2 days").font(.system(size: 12, weight: .medium)).foregroundStyle(Theme.brand500)
+                                        Spacer()
+                                        Text("View Details").font(.system(size: 12, weight: .semibold)).foregroundStyle(Theme.brand500)
+                                    }
+                                    .padding(.horizontal, 12).padding(.vertical, 10).background(Theme.brandSoft).clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                                .padding(12).background(Theme.surface).clipShape(RoundedRectangle(cornerRadius: 18))
+                                .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(Theme.border, lineWidth: 1))
                             }
-                            .padding(.horizontal, 12).padding(.vertical, 10).background(Theme.brandSoft).clipShape(RoundedRectangle(cornerRadius: 12))
                         }
-                        .padding(12).background(Theme.surface).clipShape(RoundedRectangle(cornerRadius: 18))
-                        .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(Theme.border, lineWidth: 1))
-                    }
-                    header("Past Appointments", "View All")
-                    SettingsCard {
-                        ForEach(Array(past.enumerated()), id: \.element.id) { idx, a in
-                            apptRow(a).padding(12)
-                                .overlay(idx == past.count - 1 ? nil : Rectangle().frame(height: 1).foregroundStyle(Theme.border), alignment: .bottom)
+                        if !past.isEmpty {
+                            header("Past Appointments", "View All")
+                            SettingsCard {
+                                ForEach(Array(past.enumerated()), id: \.element.id) { idx, a in
+                                    apptRow(a).padding(12)
+                                        .overlay(idx == past.count - 1 ? nil : Rectangle().frame(height: 1).foregroundStyle(Theme.border), alignment: .bottom)
+                                }
+                            }
                         }
                     }
                     HStack(spacing: 10) {
-                        tile("calendar", "8", "Total Visits", Theme.brandSoft, Theme.brand500)
-                        tile("checkmark.circle.fill", "6", "Completed", Theme.greenSoft, Theme.green)
+                        tile("calendar", "0", "Total Visits", Theme.brandSoft, Theme.brand500)
+                        tile("checkmark.circle.fill", "0", "Completed", Theme.greenSoft, Theme.green)
                     }
                     HStack(spacing: 10) {
-                        tile("clock", "2", "Upcoming", Theme.amberSoft, Theme.amber)
-                        tile("stethoscope", "3", "Doctors", Theme.blueSoft, Theme.blue)
+                        tile("clock", "0", "Upcoming", Theme.amberSoft, Theme.amber)
+                        tile("stethoscope", "0", "Doctors", Theme.blueSoft, Theme.blue)
                     }
 
                     Button { app.presentFullScreen(AddAppointmentWizardView()) } label: {

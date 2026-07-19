@@ -6,28 +6,30 @@ struct RemindersView: View {
 
     struct Reminder: Identifiable { let id = UUID(); let time: String; let ampm: String; let color: Color; let bg: Color; let name: String; let detail: String; var status: String? = nil; var statusGreen = true; var today = false }
 
-    private let today: [Reminder] = [
-        Reminder(time: "08:30", ampm: "AM", color: Theme.brand500, bg: Theme.brandSoft, name: "Vitamin D3 60K", detail: "1 Capsule · After Breakfast", status: "Due in 15 min", statusGreen: true),
-        Reminder(time: "02:30", ampm: "PM", color: Theme.amber, bg: Theme.amberSoft, name: "Paracetamol 650mg", detail: "1 Tablet · After Lunch", status: "Due in 5h 45m", statusGreen: false),
-        Reminder(time: "08:30", ampm: "PM", color: Theme.green, bg: Theme.greenSoft, name: "B-Complex", detail: "1 Tablet · After Dinner"),
-    ]
-    private let upcoming: [Reminder] = [
-        Reminder(time: "09:30", ampm: "PM", color: Theme.brand500, bg: Theme.brandSoft, name: "Calcium", detail: "1 Tablet · Before Bed", today: true),
-        Reminder(time: "10:30", ampm: "PM", color: Theme.red, bg: Theme.redSoft, name: "Omega 3", detail: "1 Capsule · After Dinner", today: true),
-    ]
+    private let today: [Reminder] = []
+    private let upcoming: [Reminder] = []
 
     var body: some View {
         VStack(spacing: 0) {
             TopBar(title: "Medication Reminders", subtitle: "Never miss your medicines")
             ScrollView {
                 VStack(spacing: 12) {
-                    InfoBanner(icon: "bell", title: "Stay on track!", subtitle: "You have 3 reminders today", showChevron: true)
-                    ChipsRow(items: [ChipItem(label: "All", count: 8), ChipItem(label: "Today", count: 3), ChipItem(label: "Tomorrow", count: 2), ChipItem(label: "Custom", count: 3)], active: $chip)
+                    InfoBanner(icon: "bell", title: "Stay on track!", subtitle: "No reminders yet", showChevron: true)
+                    ChipsRow(items: [ChipItem(label: "All", count: 0), ChipItem(label: "Today", count: 0), ChipItem(label: "Tomorrow", count: 0), ChipItem(label: "Custom", count: 0)], active: $chip)
 
-                    header("Today's Reminders")
-                    ForEach(today) { r in row(r) }
-                    header("Upcoming Reminders")
-                    ForEach(upcoming) { r in row(r) }
+                    if today.isEmpty && upcoming.isEmpty {
+                        EmptyState(icon: "bell", title: "No reminders yet",
+                                   message: "Add your medicines to start getting reminders here.")
+                    } else {
+                        if !today.isEmpty {
+                            header("Today's Reminders")
+                            ForEach(today) { r in row(r) }
+                        }
+                        if !upcoming.isEmpty {
+                            header("Upcoming Reminders")
+                            ForEach(upcoming) { r in row(r) }
+                        }
+                    }
                 }
                 .padding(.horizontal, 16).padding(.top, 4).padding(.bottom, 24)
             }

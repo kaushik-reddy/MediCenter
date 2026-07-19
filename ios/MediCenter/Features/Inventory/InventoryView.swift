@@ -5,11 +5,7 @@ struct InventoryView: View {
     @State private var chip = "All"
 
     struct Item: Identifiable { let id = UUID(); let name: String; let detail: String; let kind: PillKind; let tint: Color; let pill: Color; let statusLabel: String; let badge: Color; let bar: Color; let left: Int; let total: Int; let refill: String }
-    private let items: [Item] = [
-        Item(name: "Paracetamol 650mg", detail: "1 Tablet · 3 times daily", kind: .capsule, tint: Color(hex: "E7F6EE"), pill: Color(hex: "22C55E"), statusLabel: "Healthy", badge: Theme.green, bar: Theme.green, left: 18, total: 20, refill: "Refill in 12 days"),
-        Item(name: "B-Complex", detail: "1 Tablet · Once daily", kind: .tablet, tint: Color(hex: "FDE7F0"), pill: Color(hex: "EC4899"), statusLabel: "Low Stock", badge: Theme.amber, bar: Theme.amber, left: 3, total: 30, refill: "Refill in 3 days"),
-        Item(name: "Cetirizine 10mg", detail: "1 Tablet · At night", kind: .tablet, tint: Color(hex: "EEF0F3"), pill: Color(hex: "E5E7EB"), statusLabel: "Critical", badge: Theme.red, bar: Theme.red, left: 0, total: 10, refill: "Out of stock"),
-    ]
+    private let items: [Item] = []
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,6 +20,10 @@ struct InventoryView: View {
                             .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [5])).foregroundStyle(Theme.brand500.opacity(0.5)))
                     }
                     ForEach(items) { it in card(it) }
+                    if items.isEmpty {
+                        EmptyState(icon: "shippingbox", title: "No stock tracked",
+                                   message: "Add your medicines to track stock levels and refill reminders.")
+                    }
                 }
                 .padding(.horizontal, 16).padding(.top, 4).padding(.bottom, 24)
             }
