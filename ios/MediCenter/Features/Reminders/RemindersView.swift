@@ -6,7 +6,21 @@ struct RemindersView: View {
 
     struct Reminder: Identifiable { let id = UUID(); let time: String; let ampm: String; let color: Color; let bg: Color; let name: String; let detail: String; var status: String? = nil; var statusGreen = true; var today = false }
 
-    private let today: [Reminder] = []
+    /// Today's reminders, synced from the user's medications.
+    private var today: [Reminder] {
+        MedStore.shared.medications
+            .sorted { HomeData.minutes($0.time) < HomeData.minutes($1.time) }
+            .map { med in
+                let parts = med.time.split(separator: " ")
+                let t = parts.first.map(String.init) ?? med.time
+                let ap = parts.count > 1 ? String(parts[1]) : ""
+                let green = med.color == .green
+                return Reminder(time: t, ampm: ap,
+                                color: green ? Theme.green : Theme.brand500,
+                                bg: green ? Theme.greenSoft : Theme.brandSoft,
+                                name: med.name, detail: "\(med.dose) · \(med.food)")
+            }
+    }
     private let upcoming: [Reminder] = []
 
     var body: some View {

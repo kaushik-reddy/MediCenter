@@ -124,7 +124,14 @@ struct DeleteModal: View {
                 .padding(12).frame(maxWidth: .infinity, alignment: .leading)
                 .background(Theme.redSoft).clipShape(RoundedRectangle(cornerRadius: 12))
                 .padding(.bottom, 12)
-            ModalActions(primaryLabel: "Delete", primaryColor: AnyShapeStyle(Theme.red))
+            ModalActions(primaryLabel: "Delete", primaryColor: AnyShapeStyle(Theme.red)) {
+                if !name.isEmpty {
+                    if let med = MedStore.shared.find(name: name) {
+                        NotificationManager.shared.cancelReminders(for: med)
+                    }
+                    MedStore.shared.remove(name: name)
+                }
+            }
         }
     }
 }

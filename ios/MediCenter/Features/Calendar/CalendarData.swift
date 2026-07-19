@@ -24,41 +24,56 @@ struct DayMed: Identifiable {
 }
 
 enum CalendarData {
-    static let monthLabel = "May 2024"
+    static let monthLabel: String = {
+        let f = DateFormatter(); f.dateFormat = "MMMM yyyy"; return f.string(from: Date())
+    }()
     static let weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
+    /// Real month grid for the current month, with today marked and no fake status dots.
     static let days: [DayCell] = {
-        let g: [DotColor] = [.green]
-        return [
-            DayCell(day: 28, inMonth: false), DayCell(day: 29, inMonth: false), DayCell(day: 30, inMonth: false),
-            DayCell(day: 1, inMonth: true, dots: g), DayCell(day: 2, inMonth: true, dots: g),
-            DayCell(day: 3, inMonth: true, dots: [.amber, .red]), DayCell(day: 4, inMonth: true),
-            DayCell(day: 5, inMonth: true, dots: g), DayCell(day: 6, inMonth: true, dots: g),
-            DayCell(day: 7, inMonth: true, dots: [.red]), DayCell(day: 8, inMonth: true, dots: g),
-            DayCell(day: 9, inMonth: true, dots: [.amber]), DayCell(day: 10, inMonth: true, dots: g),
-            DayCell(day: 11, inMonth: true),
-            DayCell(day: 12, inMonth: true, dots: g), DayCell(day: 13, inMonth: true, dots: g),
-            DayCell(day: 14, inMonth: true, dots: g), DayCell(day: 15, inMonth: true, dots: g),
-            DayCell(day: 16, inMonth: true, dots: [.amber]), DayCell(day: 17, inMonth: true, dots: g),
-            DayCell(day: 18, inMonth: true, dots: g),
-            DayCell(day: 19, inMonth: true, dots: g), DayCell(day: 20, inMonth: true, today: true, dots: g),
-            DayCell(day: 21, inMonth: true, dots: g), DayCell(day: 22, inMonth: true, dots: [.red]),
-            DayCell(day: 23, inMonth: true, dots: g), DayCell(day: 24, inMonth: true, dots: g),
-            DayCell(day: 25, inMonth: true, dots: g),
-            DayCell(day: 26, inMonth: true, dots: g), DayCell(day: 27, inMonth: true, dots: [.amber]),
-            DayCell(day: 28, inMonth: true, dots: g), DayCell(day: 29, inMonth: true, dots: g),
-            DayCell(day: 30, inMonth: true, dots: g), DayCell(day: 31, inMonth: true, dots: g),
-            DayCell(day: 1, inMonth: false),
-        ]
+        let cal = Calendar.current
+        let now = Date()
+        let comps = cal.dateComponents([.year, .month], from: now)
+        guard let first = cal.date(from: comps),
+              let range = cal.range(of: .day, in: .month, for: now) else { return [] }
+        let leading = (cal.component(.weekday, from: first) - 1) // Sun-based
+        let todayDay = cal.component(.day, from: now)
+        var cells: [DayCell] = []
+        // leading days from previous month (greyed)
+        if leading > 0 {
+            for i in stride(from: leading, to: 0, by: -1) {
+                if let d = cal.date(byAdding: .day, value: -i, to: first) {
+                    cells.append(DayCell(day: cal.component(.day, from: d), inMonth: false))
+                }
+            }
+        }
+        for day in range {
+            cells.append(DayCell(day: day, inMonth: true, today: day == todayDay))
+        }
+        // trailing to fill the last week
+        var trailing = 1
+        while cells.count % 7 != 0 { cells.append(DayCell(day: trailing, inMonth: false)); trailing += 1 }
+        return cells
     }()
 
-    static let selectedDayLabel = "Monday, 20 May 2024"
-    static let selectedStats = (taken: 3, late: 1, missed: 0)
-    static let selectedMeds: [DayMed] = [
-        DayMed(name: "Paracetamol 650mg", detail: "1 Tablet · After Breakfast", time: "08:30 AM", when: .morning, status: .taken),
-        DayMed(name: "Vitamin D3 60K", detail: "1 Capsule · After Lunch", time: "02:30 PM", when: .noon, status: .late),
-        DayMed(name: "B-Complex", detail: "1 Tablet · After Dinner", time: "08:30 PM", when: .night, status: .taken),
-    ]
+    static var selectedDayLabel: String {
+        let f = DateFormatter(); f.dateFormat = "EEEE, d MMM yyyy"; return f.string(from: Date())
+    }
 
-    static let quick = (month: "May 2024", takenDays: 18, lateDays: 5, missedDays: 2, adherence: 90)
+    static var selectedStats: (taken: Int, late: Int, missed: Int) { (0, 0, 0) }
+
+    /// Today's medicines, synced from the user's store.
+    static var selectedMeds: [DayMed] {
+        MedStore.shared.medications
+            .sorted { HomeData.minutes($0.time) < HomeData.minutes($1.time) }
+            .map { med in
+                let hour = HomeData.minutes(med.time) / 60
+                let when: TimeOfDay = hour < 12 ? .morning : (hour < 17 ? .noon : .night)
+                return DayMed(name: med.name, detail: "\(med.dose) · \(med.food)", time: med.time, when: when, status: .upcoming)
+            }
+    }
+
+    static var quick: (month: String, takenDays: Int, lateDays: Int, missedDays: Int, adherence: Int) {
+        (monthLabel, 0, 0, 0, 0)
+    }
 }
