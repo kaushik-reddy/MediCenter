@@ -66,6 +66,7 @@ struct RootView: View {
                     case .contacts: EmergencyContactsView()
                     case .travel: TravelModeView()
                     case .settings: SettingsView()
+                    case .medicineDetail(let name): MedicineDetailView(name: name)
                     }
                 }
                 .toolbar(.hidden, for: .navigationBar)

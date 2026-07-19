@@ -27,7 +27,7 @@ struct MedicationsView: View {
                     searchRow
 
                     ForEach(filtered) { med in
-                        Button { app.present(MedicationOptionsModal(name: med.name, med: med)) } label: {
+                        Button { app.open(.medicineDetail(med.name)) } label: {
                             MedicationCard(med: med)
                         }
                         .buttonStyle(.plain)

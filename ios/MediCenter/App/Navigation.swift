@@ -17,6 +17,7 @@ enum AppRoute: Hashable {
     case contacts
     case travel
     case settings
+    case medicineDetail(String)
 
     var title: String {
         switch self {
@@ -33,6 +34,7 @@ enum AppRoute: Hashable {
         case .contacts: return "Emergency Contacts"
         case .travel: return "Travel Mode"
         case .settings: return "Settings"
+        case .medicineDetail: return "Medicine Details"
         }
     }
 
@@ -51,6 +53,7 @@ enum AppRoute: Hashable {
         case .contacts: return "phone"
         case .travel: return "airplane"
         case .settings: return "gearshape"
+        case .medicineDetail: return "pills"
         }
     }
 }
