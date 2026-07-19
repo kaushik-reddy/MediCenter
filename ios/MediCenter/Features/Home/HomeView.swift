@@ -18,7 +18,7 @@ struct HomeView: View {
                         TodayScheduleCard(items: HomeData.todaySchedule) {
                             app.selectedTab = .calendar
                         }
-                        ProgressCard(progress: HomeData.weekProgress)
+                        ProgressCard()
 
                         // Tip of the day is always pinned to the bottom, above the nav bar
                         Spacer(minLength: 12)
