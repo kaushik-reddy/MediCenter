@@ -32,18 +32,18 @@ struct TopBar: View {
             VStack(alignment: .leading, spacing: 1) {
                 if greeting {
                     Text(title)
-                        .font(.system(size: 17, weight: .heavy))
+                        .font(.system(size: 15.5, weight: .heavy))
                         .foregroundStyle(Theme.text)
                         .lineLimit(1)
                     if let subtitle {
                         Text(subtitle)
-                            .font(.system(size: 12))
+                            .font(.system(size: 11.5))
                             .foregroundStyle(Theme.textMuted)
                             .lineLimit(1)
                     }
                 } else {
                     Text(title)
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 15.5, weight: .bold))
                         .foregroundStyle(Theme.text)
                     if let subtitle {
                         Text(subtitle)

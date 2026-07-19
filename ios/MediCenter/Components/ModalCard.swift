@@ -21,10 +21,10 @@ struct ModalCard<Content: View>: View {
                             .padding(.bottom, 8)
                     }
                     if let title {
-                        Text(title).font(.system(size: 18, weight: .bold)).foregroundStyle(Theme.text)
+                        Text(title).font(.system(size: 16, weight: .bold)).foregroundStyle(Theme.text)
                     }
                     if let subtitle {
-                        Text(subtitle).font(.system(size: 13)).foregroundStyle(Theme.textMuted)
+                        Text(subtitle).font(.system(size: 12)).foregroundStyle(Theme.textMuted)
                             .multilineTextAlignment(.center)
                     }
                 }

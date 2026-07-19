@@ -90,6 +90,70 @@ enum Theme {
     static let radiusXl: CGFloat = 24
 }
 
+// MARK: - Typography scale
+// One standardized type ramp used app-wide so sizes stay consistent. Values are tuned a
+// notch smaller than before (headers/titles were reading too big). Use `.appFont(.x)`.
+
+enum AppFont {
+    case screenTitle   // top-bar / screen titles
+    case screenSub     // top-bar subtitle
+    case cardTitle     // med / list card titles
+    case sectionTitle  // section header
+    case modalTitle    // popup titles
+    case bodyStrong    // emphasised body
+    case body          // default body / field text
+    case callout       // secondary labels
+    case footnote      // meta lines
+    case caption       // small captions
+    case micro         // tiny labels / weekday letters
+    case statNumber    // big numeric stats
+    case statNumberSm
+
+    var size: CGFloat {
+        switch self {
+        case .screenTitle:   return 15.5
+        case .screenSub:     return 11.5
+        case .cardTitle:     return 14.5
+        case .sectionTitle:  return 14
+        case .modalTitle:    return 16
+        case .bodyStrong:    return 13
+        case .body:          return 13
+        case .callout:       return 12
+        case .footnote:      return 11.5
+        case .caption:       return 11
+        case .micro:         return 10
+        case .statNumber:    return 28
+        case .statNumberSm:  return 22
+        }
+    }
+
+    var weight: Font.Weight {
+        switch self {
+        case .screenTitle:   return .bold
+        case .screenSub:     return .regular
+        case .cardTitle:     return .bold
+        case .sectionTitle:  return .bold
+        case .modalTitle:    return .bold
+        case .bodyStrong:    return .semibold
+        case .body:          return .regular
+        case .callout:       return .medium
+        case .footnote:      return .regular
+        case .caption:       return .regular
+        case .micro:         return .semibold
+        case .statNumber:    return .heavy
+        case .statNumberSm:  return .heavy
+        }
+    }
+
+    var font: Font { .system(size: size, weight: weight) }
+}
+
+extension View {
+    /// Apply a standardized type token (size + weight).
+    func appFont(_ token: AppFont) -> some View { self.font(token.font) }
+}
+
+
 // MARK: - Reusable card style
 
 struct CardStyle: ViewModifier {

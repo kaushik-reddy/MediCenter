@@ -35,7 +35,7 @@ struct SectionHeader: View {
                         .foregroundStyle(Theme.brand500)
                 }
                 Text(title)
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Theme.text)
             }
             Spacer()

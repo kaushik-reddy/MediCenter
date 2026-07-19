@@ -37,24 +37,31 @@ struct MarkAsTakenModal: View {
 }
 
 struct AddMedicationModal: View {
+    @State private var step = 0
     @State private var name = ""
     @State private var dosage = ""
     @State private var schedule = true
+    private let steps = [FlowStep(icon: "pills", label: "Details"),
+                         FlowStep(icon: "bell.badge", label: "Schedule")]
     var body: some View {
-        ModalCard(icon: "pills", title: "Add New Medication", subtitle: "Enter your medicine details") {
-            ModalField(label: "Medication Name", text: $name)
-            ModalField(label: "Dosage", text: $dosage)
-            HStack {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text("Add to Schedule").font(.system(size: 13.5, weight: .semibold)).foregroundStyle(Theme.text)
-                    Text("Get reminders for this medicine").font(.system(size: 11.5)).foregroundStyle(Theme.textMuted)
+        StepFlow(title: "Add Medication", steps: steps, step: $step,
+                 finishLabel: "Save Medication", canProceed: step == 0 ? !name.isEmpty : true) { i in
+            if i == 0 {
+                VStack(spacing: 0) {
+                    ModalField(label: "Medication Name", text: $name)
+                    ModalField(label: "Dosage", text: $dosage)
                 }
-                Spacer()
-                Toggle("", isOn: $schedule).labelsHidden().tint(Theme.brand500)
+            } else {
+                HStack {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Add to Schedule").font(.system(size: 13.5, weight: .semibold)).foregroundStyle(Theme.text)
+                        Text("Get reminders for this medicine").font(.system(size: 11.5)).foregroundStyle(Theme.textMuted)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $schedule).labelsHidden().tint(Theme.brand500)
+                }
+                .padding(12).background(Theme.surface2).clipShape(RoundedRectangle(cornerRadius: 12))
             }
-            .padding(12).background(Theme.surface2).clipShape(RoundedRectangle(cornerRadius: 12))
-            .padding(.bottom, 12)
-            ModalActions(primaryLabel: "Save Medication")
         }
     }
 }
@@ -62,28 +69,35 @@ struct AddMedicationModal: View {
 struct SetReminderModal: View {
     var name: String = ""
     var med: Medication? = nil
+    @State private var step = 0
     @State private var days = [true, true, true, true, true, false, false]
     private let labels = ["M", "T", "W", "T", "F", "S", "S"]
+    private let steps = [FlowStep(icon: "clock", label: "Time"),
+                         FlowStep(icon: "calendar", label: "Repeat")]
     var body: some View {
-        ModalCard(icon: "alarm", title: "Set Reminder Time", subtitle: name.isEmpty ? "Choose when to be reminded" : name) {
-            Text(med?.time ?? "08:30 AM").font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.brand500)
-                .frame(maxWidth: .infinity).padding(.vertical, 8)
-            Text("Repeat").font(.system(size: 12.5, weight: .semibold)).foregroundStyle(Theme.textMuted)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            HStack {
-                ForEach(0..<7, id: \.self) { i in
-                    Button { days[i].toggle() } label: {
-                        Text(labels[i]).font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(days[i] ? .white : Theme.textMuted)
-                            .frame(width: 36, height: 36)
-                            .background(days[i] ? Theme.brand500 : Theme.surface2).clipShape(Circle())
-                    }
-                    if i < 6 { Spacer() }
+        StepFlow(title: name.isEmpty ? "Set Reminder" : name, steps: steps, step: $step,
+                 finishLabel: "Save Reminder", onFinish: { scheduleReminder() }) { i in
+            if i == 0 {
+                VStack(spacing: 4) {
+                    Text(med?.time ?? "08:30 AM").font(.system(size: 30, weight: .heavy)).foregroundStyle(Theme.brand500)
+                    Text("Tap Next to choose repeat days").font(.system(size: 11.5)).foregroundStyle(Theme.textMuted)
                 }
-            }
-            .padding(.vertical, 8)
-            ModalActions(primaryLabel: "Save Reminder") {
-                scheduleReminder()
+                .frame(maxWidth: .infinity).padding(.vertical, 8)
+            } else {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Repeat on").font(.system(size: 12.5, weight: .semibold)).foregroundStyle(Theme.textMuted)
+                    HStack {
+                        ForEach(0..<7, id: \.self) { d in
+                            Button { days[d].toggle() } label: {
+                                Text(labels[d]).font(.system(size: 13, weight: .bold))
+                                    .foregroundStyle(days[d] ? .white : Theme.textMuted)
+                                    .frame(width: 36, height: 36)
+                                    .background(days[d] ? Theme.brand500 : Theme.surface2).clipShape(Circle())
+                            }
+                            if d < 6 { Spacer() }
+                        }
+                    }
+                }
             }
         }
     }

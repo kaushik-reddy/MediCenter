@@ -13,7 +13,7 @@ struct MedicationCard: View {
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Text(med.name)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 14.5, weight: .bold))
                         .foregroundStyle(Theme.text)
                         .lineLimit(1)
                     Spacer()

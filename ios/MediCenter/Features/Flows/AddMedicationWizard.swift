@@ -25,14 +25,21 @@ struct AddMedicationWizardView: View {
 
     private var isLast: Bool { step == 4 }
 
+    private let wizardSteps = [
+        FlowStep(icon: "magnifyingglass", label: "Details"),
+        FlowStep(icon: "pills", label: "Dosage"),
+        FlowStep(icon: "calendar", label: "Frequency"),
+        FlowStep(icon: "bell", label: "Reminders"),
+        FlowStep(icon: "shippingbox", label: "Stock"),
+    ]
+
     var body: some View {
         VStack(spacing: 0) {
             header
-            HStack(alignment: .top, spacing: 0) {
-                stepperRail
-                ScrollView {
-                    stepContent.padding(.horizontal, 12).padding(.top, 8).padding(.bottom, 16)
-                }
+            StepTimeline(steps: wizardSteps, current: step)
+                .padding(.horizontal, 16).padding(.bottom, 12)
+            ScrollView {
+                stepContent.padding(.horizontal, 16).padding(.top, 2).padding(.bottom, 16)
             }
             footer
         }
@@ -48,12 +55,10 @@ struct AddMedicationWizardView: View {
                     .background(Theme.surface2).clipShape(RoundedRectangle(cornerRadius: 12))
             }
             VStack(alignment: .leading, spacing: 1) {
-                Text("Add New Medication").font(.system(size: 18, weight: .heavy)).foregroundStyle(Theme.text)
+                Text("Add New Medication").font(.system(size: 16, weight: .heavy)).foregroundStyle(Theme.text)
                 Text("Step by step to set up your medicine").font(.system(size: 11.5)).foregroundStyle(Theme.textMuted)
             }
             Spacer(minLength: 0)
-            Text("\(step + 1)/5").font(.system(size: 12, weight: .heavy)).foregroundStyle(Theme.brand500)
-                .frame(width: 40, height: 40).overlay(Circle().strokeBorder(Theme.border, lineWidth: 3))
             Button { app.dismissFullScreen() } label: {
                 Image(systemName: "xmark").font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Theme.text).frame(width: 36, height: 36)
@@ -61,30 +66,6 @@ struct AddMedicationWizardView: View {
             }
         }
         .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 10)
-    }
-
-    // MARK: Stepper rail
-    private var stepperRail: some View {
-        VStack(alignment: .leading, spacing: 22) {
-            ForEach(Array(steps.enumerated()), id: \.offset) { i, label in
-                HStack(alignment: .top, spacing: 6) {
-                    ZStack {
-                        Circle().fill(i == step ? Theme.brand500 : (i < step ? Theme.green : Theme.surface2))
-                            .frame(width: 30, height: 30)
-                        if i < step {
-                            Image(systemName: "checkmark").font(.system(size: 12, weight: .bold)).foregroundStyle(.white)
-                        } else {
-                            Text("\(i + 1)").font(.system(size: 12, weight: .bold))
-                                .foregroundStyle(i == step ? .white : Theme.textMuted)
-                        }
-                    }
-                    Text(label).font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(i == step ? Theme.brand500 : (i < step ? Theme.text : Theme.textFaint))
-                        .fixedSize(horizontal: false, vertical: true).frame(width: 52, alignment: .leading)
-                }
-            }
-        }
-        .padding(.leading, 12).padding(.top, 6).frame(width: 96, alignment: .leading)
     }
 
     // MARK: Step content
@@ -274,7 +255,7 @@ struct AddMedicationWizardView: View {
             Image(systemName: icon).font(.system(size: 16)).foregroundStyle(Theme.brand500)
                 .frame(width: 40, height: 40).background(Theme.brandSoft).clipShape(RoundedRectangle(cornerRadius: 12))
             VStack(alignment: .leading, spacing: 1) {
-                Text(title).font(.system(size: 15, weight: .bold)).foregroundStyle(Theme.text)
+                Text(title).font(.system(size: 14, weight: .bold)).foregroundStyle(Theme.text)
                 Text(sub).font(.system(size: 11.5)).foregroundStyle(Theme.textMuted)
             }
             Spacer(minLength: 0)
