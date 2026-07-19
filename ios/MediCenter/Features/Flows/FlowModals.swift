@@ -145,3 +145,56 @@ struct ReorderModal: View {
         }
     }
 }
+
+struct FilterModal: View {
+    @State private var food: String? = nil
+    @State private var timeOfDay: String? = nil
+    @State private var sched: String? = nil
+    private let foods = ["Before Food", "After Food", "Before Bed"]
+    private let times = ["Morning", "Afternoon", "Evening", "Night"]
+    private let scheds = ["Everyday", "Weekdays", "Custom"]
+
+    var body: some View {
+        ModalCard(icon: "slider.horizontal.3", title: "Filter", subtitle: "Narrow down your list") {
+            filterGroup("Food", options: foods, selection: $food)
+            filterGroup("Time of Day", options: times, selection: $timeOfDay)
+            filterGroup("Schedule", options: scheds, selection: $sched)
+            ModalActions(primaryLabel: "Apply Filters") {
+                food = nil; timeOfDay = nil; sched = nil
+            }
+        }
+    }
+
+    private func filterGroup(_ label: String, options: [String], selection: Binding<String?>) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label).font(.system(size: 12.5, weight: .semibold)).foregroundStyle(Theme.textMuted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            FlowChips(options: options, selection: selection)
+        }
+        .padding(.bottom, 14)
+    }
+}
+
+private struct FlowChips: View {
+    let options: [String]
+    @Binding var selection: String?
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(options, id: \.self) { opt in
+                let active = selection == opt
+                Button {
+                    selection = active ? nil : opt
+                } label: {
+                    Text(opt)
+                        .font(.system(size: 12.5, weight: .semibold))
+                        .foregroundStyle(active ? Color.white : Theme.textMuted)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(active ? AnyShapeStyle(Theme.brand500) : AnyShapeStyle(Theme.surface2))
+                        .clipShape(Capsule())
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}

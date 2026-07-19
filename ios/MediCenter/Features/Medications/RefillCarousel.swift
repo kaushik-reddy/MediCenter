@@ -1,10 +1,14 @@
 import SwiftUI
 
 struct RefillCarousel: View {
+    @Environment(AppState.self) private var app
+
     var body: some View {
         SectionCard {
             VStack(alignment: .leading, spacing: 12) {
-                SectionHeader(systemImage: "shippingbox", title: "Refill & Low Stock", actionLabel: "View all")
+                SectionHeader(systemImage: "shippingbox", title: "Refill & Low Stock", actionLabel: "View all") {
+                    app.open(.inventory)
+                }
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
@@ -13,31 +17,50 @@ struct RefillCarousel: View {
                         }
                     }
                 }
+
+                HStack(spacing: 6) {
+                    ForEach(MedicationsData.refills.indices, id: \.self) { i in
+                        Capsule()
+                            .fill(i == 0 ? Theme.brand500 : Theme.borderStrong)
+                            .frame(width: i == 0 ? 16 : 6, height: 6)
+                    }
+                }
+                .frame(maxWidth: .infinity)
             }
         }
     }
 }
 
 private struct RefillCard: View {
+    @Environment(AppState.self) private var app
     let item: RefillItem
     private var accent: Color { item.isLow ? Theme.red : Theme.amber }
 
     var body: some View {
         VStack(spacing: 10) {
-            HStack(spacing: 10) {
-                MedThumb(kind: item.kind, tint: .white, pillColor: item.pillColor, size: 52)
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack {
-                        Text(item.name).font(.system(size: 14, weight: .bold)).foregroundStyle(Theme.text).lineLimit(1)
-                        Spacer()
-                        Image(systemName: "chevron.right").font(.system(size: 13, weight: .semibold)).foregroundStyle(Theme.textFaint)
+            Button { app.present(MedicationOptionsModal(name: item.name)) } label: {
+                HStack(spacing: 10) {
+                    MedThumb(kind: item.kind, tint: .white, pillColor: item.pillColor, size: 52)
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Text(item.name).font(.system(size: 14, weight: .bold)).foregroundStyle(Theme.text).lineLimit(1)
+                            Spacer()
+                            Image(systemName: "chevron.right").font(.system(size: 13, weight: .semibold)).foregroundStyle(Theme.textFaint)
+                        }
+                        Text(item.statusLabel).font(.system(size: 12, weight: .semibold)).foregroundStyle(accent)
+                        Text(item.detail).font(.system(size: 11)).foregroundStyle(Theme.textMuted).lineLimit(1)
                     }
-                    Text(item.statusLabel).font(.system(size: 12, weight: .semibold)).foregroundStyle(accent)
-                    Text(item.detail).font(.system(size: 11)).foregroundStyle(Theme.textMuted).lineLimit(1)
                 }
             }
+            .buttonStyle(.plain)
 
-            Button {} label: {
+            Button {
+                if item.isLow {
+                    app.present(ReorderModal(name: item.name))
+                } else {
+                    app.present(SetReminderModal(name: item.name))
+                }
+            } label: {
                 HStack(spacing: 6) {
                     Image(systemName: item.isLow ? "cart" : "bell.badge").font(.system(size: 13))
                     Text(item.isLow ? "Reorder" : "Set Reminder").font(.system(size: 12.5, weight: .bold))

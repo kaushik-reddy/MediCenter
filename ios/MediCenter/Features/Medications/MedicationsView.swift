@@ -7,10 +7,14 @@ struct MedicationsView: View {
 
     enum Tab { case medications, supplements }
 
+    private var source: [Medication] {
+        MedicationsData.items(for: tab == .supplements ? .supplement : .medication)
+    }
+
     private var filtered: [Medication] {
         query.isEmpty
-            ? MedicationsData.medications
-            : MedicationsData.medications.filter { $0.name.localizedCaseInsensitiveContains(query) }
+            ? source
+            : source.filter { $0.name.localizedCaseInsensitiveContains(query) }
     }
 
     var body: some View {
@@ -27,6 +31,17 @@ struct MedicationsView: View {
                             MedicationCard(med: med)
                         }
                         .buttonStyle(.plain)
+                    }
+
+                    if filtered.isEmpty {
+                        Text("No \(tab == .supplements ? "supplements" : "medications") found.")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.textMuted)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 32)
+                            .background(Theme.surface)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.border, lineWidth: 1))
                     }
 
                     RefillCarousel()
@@ -81,7 +96,7 @@ struct MedicationsView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Theme.border, lineWidth: 1))
 
-            Button {} label: {
+            Button { app.present(FilterModal()) } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "slider.horizontal.3").font(.system(size: 14))
                     Text("Filter").font(.system(size: 13, weight: .semibold))

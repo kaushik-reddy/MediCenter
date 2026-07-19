@@ -5,6 +5,7 @@ import SwiftUI
 enum PillKind { case capsule, softgel, tablet }
 enum ScheduleColor { case green, purple }
 enum DayState { case on, ring, off }
+enum MedCategory { case medication, supplement }
 
 struct Medication: Identifiable {
     let id = UUID()
@@ -18,6 +19,7 @@ struct Medication: Identifiable {
     let tint: Color
     let pillColor: Color
     let days: [DayState]
+    var category: MedCategory = .medication
 }
 
 struct RefillItem: Identifiable {
@@ -51,6 +53,29 @@ enum MedicationsData {
                    time: "09:30 PM", color: .purple, kind: .tablet,
                    tint: Color(hex: "EEF0F3"), pillColor: Color(hex: "E5E7EB"), days: week),
     ]
+
+    static let supplements: [Medication] = [
+        Medication(name: "Vitamin C 500mg", dose: "1 Tablet", food: "After Food", foodIcon: "fork.knife",
+                   time: "11:00 AM", color: .green, kind: .tablet,
+                   tint: Color(hex: "FDECE0"), pillColor: Color(hex: "F97316"), days: week,
+                   category: .supplement),
+        Medication(name: "Fish Oil", dose: "1 Capsule", food: "After Food", foodIcon: "fork.knife",
+                   time: "09:00 AM", color: .green, kind: .softgel,
+                   tint: Color(hex: "E6F0FD"), pillColor: Color(hex: "3B82F6"), days: week,
+                   category: .supplement),
+        Medication(name: "Magnesium", dose: "1 Tablet", food: "Before Bed", foodIcon: "moon.fill",
+                   time: "10:00 PM", color: .purple, kind: .tablet,
+                   tint: Color(hex: "E7F6EE"), pillColor: Color(hex: "10B981"), days: week,
+                   category: .supplement),
+        Medication(name: "Probiotic", dose: "1 Capsule", food: "Before Food", foodIcon: "fork.knife",
+                   time: "07:30 AM", color: .green, kind: .capsule,
+                   tint: Color(hex: "FDE7F0"), pillColor: Color(hex: "EC4899"), days: week,
+                   category: .supplement),
+    ]
+
+    static func items(for category: MedCategory) -> [Medication] {
+        category == .supplement ? supplements : medications
+    }
 
     static let refills: [RefillItem] = [
         RefillItem(name: "B-Complex", isLow: true, statusLabel: "Low Stock (3 left)",
