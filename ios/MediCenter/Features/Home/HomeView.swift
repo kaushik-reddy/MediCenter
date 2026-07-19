@@ -14,9 +14,23 @@ struct HomeView: View {
             GeometryReader { geo in
                 ScrollView {
                     VStack(spacing: 16) {
-                        NextDoseCard(dose: HomeData.nextDose)
-                        TodayScheduleCard(items: HomeData.todaySchedule) {
-                            app.selectedTab = .calendar
+                        if let dose = HomeData.nextDose {
+                            NextDoseCard(dose: dose)
+                        } else {
+                            EmptyState(
+                                icon: "pills",
+                                title: "No medications yet",
+                                message: "Add your medicines to see your next dose and daily schedule.",
+                                actionLabel: "Add Medication",
+                                action: { app.presentFullScreen(AddMedicationWizardView()) }
+                            )
+                        }
+
+                        let schedule = HomeData.todaySchedule
+                        if !schedule.isEmpty {
+                            TodayScheduleCard(items: schedule) {
+                                app.selectedTab = .calendar
+                            }
                         }
                         ProgressCard()
 

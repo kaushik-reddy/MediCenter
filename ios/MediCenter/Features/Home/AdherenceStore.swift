@@ -6,13 +6,23 @@ import SwiftUI
 @Observable
 final class AdherenceStore {
     static let shared = AdherenceStore()
-    private init() {}
+    private let key = "adherence.taken.v1"
+    private init() {
+        taken = Persisted.load([Int].self, key) ?? [0, 0, 0, 0, 0, 0, 0]
+    }
 
     let labels = ["M", "T", "W", "T", "F", "S", "S"]
-    /// Index 0 = Monday … 6 = Sunday.
-    var taken: [Int] = [3, 3, 3, 3, 3, 1, 0]
-    var total: [Int] = [3, 3, 3, 3, 3, 3, 3]
-    var streakDays = 12
+    /// Doses taken per day (index 0 = Monday … 6 = Sunday). Persisted.
+    var taken: [Int] {
+        didSet { Persisted.save(taken, key) }
+    }
+    var streakDays = 0
+
+    /// Total scheduled doses per day = number of medications the user has (once/day each).
+    var total: [Int] {
+        let n = MedStore.shared.medications.count
+        return Array(repeating: n, count: 7)
+    }
 
     /// Monday-based index of today.
     var todayIndex: Int {
@@ -37,9 +47,9 @@ final class AdherenceStore {
         if taken[i] < total[i] { taken[i] += 1 }
     }
 
-    /// Skipping a dose removes it from today's required total (counts as handled).
+    /// Skipping a dose still counts today's slot as handled.
     func skipToday() {
         let i = todayIndex
-        if total[i] > taken[i] { total[i] -= 1 }
+        if taken[i] < total[i] { taken[i] += 1 }
     }
 }

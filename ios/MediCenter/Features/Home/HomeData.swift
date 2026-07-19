@@ -1,6 +1,7 @@
 import Foundation
 
-// Local demo data for the Home screen. Mirrors the reference design and the web app.
+// Home screen models. No seeded data — the Home screen derives everything from the user's
+// own medications in `MedStore`.
 
 enum DoseStatus {
     case taken, upcoming, pending, late, missed
@@ -21,32 +22,31 @@ struct NextDose {
     let detail: String
 }
 
-struct WeekProgress {
-    let percent: Int
-    let streakDays: Int
-    /// 1 = full, 0.5 = half, 0 = empty. Index 0 = Mon ... 6 = Sun
-    let week: [Double]
-    let weekLabels: [String]
-}
-
 enum HomeData {
-    static let nextDose = NextDose(
-        inLabel: "01:45",
-        atTime: "10:30 AM",
-        name: "Paracetamol 650mg",
-        detail: "1 Tablet · After Food"
-    )
+    /// Sort key: minutes-since-midnight from a "hh:mm a" time string.
+    static func minutes(_ time: String) -> Int {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "hh:mm a"
+        guard let d = f.date(from: time) else { return 0 }
+        let c = Calendar.current.dateComponents([.hour, .minute], from: d)
+        return (c.hour ?? 0) * 60 + (c.minute ?? 0)
+    }
 
-    static let todaySchedule: [ScheduleItem] = [
-        ScheduleItem(time: "08:30 AM", name: "Vitamin D3 60K", detail: "1 Capsule · After Food", status: .taken),
-        ScheduleItem(time: "10:30 AM", name: "Paracetamol 650mg", detail: "1 Tablet · After Food", status: .upcoming),
-        ScheduleItem(time: "08:30 PM", name: "B-Complex", detail: "1 Tablet · After Dinner", status: .pending),
-    ]
+    /// Today's schedule from the user's medications, ordered by time.
+    static var todaySchedule: [ScheduleItem] {
+        MedStore.shared.medications
+            .sorted { minutes($0.time) < minutes($1.time) }
+            .map { ScheduleItem(time: $0.time, name: $0.name, detail: "\($0.dose) · \($0.food)", status: .upcoming) }
+    }
 
-    static let weekProgress = WeekProgress(
-        percent: 85,
-        streakDays: 12,
-        week: [1, 1, 1, 1, 1, 0.5, 0],
-        weekLabels: ["M", "T", "W", "T", "F", "S", "S"]
-    )
+    /// The next upcoming dose (soonest after now, else the earliest of the day). Nil if none.
+    static var nextDose: NextDose? {
+        let meds = MedStore.shared.medications.sorted { minutes($0.time) < minutes($1.time) }
+        guard !meds.isEmpty else { return nil }
+        let now = Calendar.current.dateComponents([.hour, .minute], from: Date())
+        let nowMin = (now.hour ?? 0) * 60 + (now.minute ?? 0)
+        let m = meds.first { minutes($0.time) >= nowMin } ?? meds[0]
+        return NextDose(inLabel: "", atTime: m.time, name: m.name, detail: "\(m.dose) · \(m.food)")
+    }
 }

@@ -4,6 +4,14 @@ struct RefillCarousel: View {
     @Environment(AppState.self) private var app
 
     var body: some View {
+        if MedicationsData.refills.isEmpty {
+            EmptyView()
+        } else {
+            card
+        }
+    }
+
+    private var card: some View {
         SectionCard {
             VStack(alignment: .leading, spacing: 12) {
                 SectionHeader(systemImage: "shippingbox", title: "Refill & Low Stock", actionLabel: "View all") {

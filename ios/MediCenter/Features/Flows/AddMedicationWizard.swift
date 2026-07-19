@@ -226,7 +226,7 @@ struct AddMedicationWizardView: View {
                     .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Theme.border, lineWidth: 1))
             }
             Button {
-                if isLast { app.dismissFullScreen() } else { step += 1 }
+                if isLast { saveMedication(); app.dismissFullScreen() } else { step += 1 }
             } label: {
                 HStack(spacing: 6) {
                     if isLast { Image(systemName: "checkmark") }
@@ -241,6 +241,34 @@ struct AddMedicationWizardView: View {
             .opacity(step == 0 && name.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
         }
         .padding(16).overlay(Rectangle().fill(Theme.border).frame(height: 1), alignment: .top)
+    }
+
+    /// Build a Medication from the entered fields and persist it in the store.
+    private func saveMedication() {
+        let trimmed = name.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
+        let kindMap: PillKind = form == "Capsule" ? .capsule : (form == "Syrup" ? .softgel : .tablet)
+        let palette: [(String, String)] = [
+            ("E7F6EE", "22C55E"), ("FDF3D8", "F59E0B"), ("FDE7F0", "EC4899"),
+            ("E6F0FD", "3B82F6"), ("EEF0F3", "8B5CF6"),
+        ]
+        let p = palette[MedStore.shared.meds.count % palette.count]
+        let strengthText = strength.trimmingCharacters(in: .whitespaces)
+        let med = Medication(
+            name: strengthText.isEmpty ? trimmed : "\(trimmed) \(strengthText)\(unit)",
+            dose: "1 \(form)",
+            food: how,
+            foodIcon: how.localizedCaseInsensitiveContains("bed") ? "moon.fill" : "fork.knife",
+            time: times.first ?? "08:00 AM",
+            color: .green,
+            kind: kindMap,
+            tintHex: p.0,
+            pillHex: p.1,
+            days: MedicationsData.week,
+            category: .medication
+        )
+        MedStore.shared.add(med)
+        NotificationManager.shared.scheduleDoseReminders(for: med, leadMinutes: 60)
     }
 
     // MARK: Helpers
